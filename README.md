@@ -71,12 +71,69 @@ variables -- `go_path`, `go_mod_cache`, `go_cache`, `python_user_base`,
 `gradle_user_home`. Arbitrary environment variable names are rejected so a
 credential vector can never become preservable by typo.
 
+## Ephemeral PostgreSQL
+
+`stricttest.pgcluster` boots a throwaway cluster for suites that need a real
+database. It is a cluster *launcher*, one layer below the per-test database
+managers consumers already have: `initdb --no-sync` into tmpfs, a postmaster on
+a short dedicated unix socket with `fsync=off`, and a base libpq URL exported
+under the environment variable **you** name. One shared cluster per session,
+one ephemeral database per test.
+
+```python
+import pytest
+from stricttest.pgcluster import ephemeral_cluster
+
+@pytest.fixture(scope="session")
+def pg():
+    with ephemeral_cluster(dsn_env="MYAPP_DATABASE_URL") as cluster:
+        yield cluster
+
+@pytest.fixture
+def db_url(pg):
+    with pg.database(export=True) as url:
+        yield url
+```
+
+There is no default for `dsn_env`: the variable an application reads its
+connection string from is the application's decision. The kernel's 107-byte
+`sun_path` limit is checked before anything is executed, so a long temp path
+fails with a precise message instead of an unexplained `bind()` error. The
+cluster listens on a unix socket only -- an in-process driver therefore needs
+the socket directory's parent in `stricttest_unix_socket_allowlist` (e.g.
+`/dev/shm/`); `psql` subprocesses need nothing.
+
+## The Go module
+
+Go suites get the same environment floor as a package of explicit helpers, since
+Go has no plugin mechanism to bind one automatically:
+
+```go
+func TestSomething(t *testing.T) {
+	hygiene.Isolate(t)
+}
+```
+
+One call gives the test a throwaway `HOME`, an empty git config with a throwaway
+identity, `GIT_ALLOW_PROTOCOL=file`, and an environment stripped of every
+ambient credential -- all restored when the test ends. `ThrowawayHome`,
+`IsolateGitConfig`, `LockdownTransports`, `StripCredentials` and `Chdir` are
+exported individually, and `Preserve(hygiene.GoModCache, ...)` keeps the named
+toolchain caches pointing at the real home. Every helper mutates the environment
+through `TB.Setenv`, which panics under `t.Parallel` -- intended, since a
+parallel test cannot own a process-wide variable like `HOME`. See
+[go/](go/) for details.
+
 ## Scope
 
 The socket guard sees connects made through Python's `socket` module. Network
 performed by a spawned subprocess (git, gh, psql) is invisible to it;
 whole-process network isolation is the sandbox runner's job. The guard is the
 in-process floor beneath it, not a replacement for it.
+
+There is no socket guard in the Go module at all: Go has no `sys.addaudithook`
+equivalent, so network isolation for Go suites belongs entirely to the sandbox
+runner.
 
 ## License
 

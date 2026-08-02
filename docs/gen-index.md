@@ -14,6 +14,7 @@ order: 90
 - [python.src.stricttest](python-src-stricttest.html)
 - [python.src.stricttest.config](python-src-stricttest-config.html)
 - [python.src.stricttest.envfloor](python-src-stricttest-envfloor.html)
+- [python.src.stricttest.pgcluster](python-src-stricttest-pgcluster.html)
 - [python.src.stricttest.plugin](python-src-stricttest-plugin.html)
 - [python.src.stricttest.pushguard](python-src-stricttest-pushguard.html)
 - [python.src.stricttest.sandbox](python-src-stricttest-sandbox.html)
