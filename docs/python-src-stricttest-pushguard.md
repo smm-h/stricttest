@@ -1,8 +1,7 @@
 ---
 title: python.src.stricttest.pushguard
-description: "Structural push guard: a real ``git push`` to a NON-LOCAL remote is impossible."
+description: "The structural push guard: classification of local versus non-local git remotes, and the subprocess.Popen wrapper that fails a test attempting a real remote push."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 5
 ---

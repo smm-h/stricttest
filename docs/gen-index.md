@@ -1,8 +1,7 @@
 ---
 title: API Reference
-description: "API reference index covering 8 modules"
+description: "Index of the stricttest API reference: the pytest plugin's configuration, environment floor, socket guard, push guard and sandbox modules, plus the Go hygiene package."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 0
 order: 90

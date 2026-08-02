@@ -1,8 +1,7 @@
 ---
 title: go/hygiene
-description: "Package hygiene provides test-environment isolation helpers for Go suites: a throwaway HOME, an isolated git config and identity, transport lockdown, credential stripping, and cleanup-restoring chdir."
+description: "The Go env-hygiene package: throwaway HOME, isolated git config and identity, transport lockdown, credential stripping and cleanup-restoring chdir for Go test suites."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 1
 ---

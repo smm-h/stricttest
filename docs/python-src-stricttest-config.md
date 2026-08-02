@@ -1,8 +1,7 @@
 ---
 title: python.src.stricttest.config
-description: "Ini-file configuration for the stricttest floor."
+description: "Ini-key registration, validation and resolution: the five required safety keys, the closed preservation enum, and the parameterized floor constants with their defaults."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 2
 ---

@@ -1,8 +1,7 @@
 ---
 title: python.src.stricttest.sandbox
-description: "Bare-run refusal and the TMPDIR-inside-repo refusal."
+description: "Two startup guards: the bare-run threshold that pushes full-suite runs through the sandbox runner, and refusal of a TMPDIR or basetemp inside the project root."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 6
 ---

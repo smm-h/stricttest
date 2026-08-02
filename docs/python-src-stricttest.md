@@ -1,8 +1,7 @@
 ---
 title: python.src.stricttest
-description: "stricttest -- an always-on test-isolation floor for pytest suites."
+description: "The stricttest package root, re-exporting the surface a consumer asserts against: resolved settings, the closed preserve enum, required keys and the refusal type."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 1
 ---
