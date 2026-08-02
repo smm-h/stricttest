@@ -25,10 +25,12 @@ jobs:
             - 'python/**'
             - 'python/**'
             - 'LICENSE'
+            - '.rlsbl-monorepo/releasables/py-stricttest/CHANGELOG.md'
           go-stricttest:
             - 'go/**'
             - 'go/**'
             - 'LICENSE'
+            - '.rlsbl-monorepo/releasables/go-stricttest/CHANGELOG.md'
   stricttest-ci-test:
     runs-on: ubuntu-latest
     strategy:
