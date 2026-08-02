@@ -1,6 +1,6 @@
 ---
 title: python.src.stricttest.envfloor
-description: "The always-on env-poisoning floor: throwaway HOME and XDG directories, a throwaway git identity and config, transport lockdown, and enumerated credential stripping."
+description: "The always-on env-poisoning floor: throwaway HOME and XDG dirs, a throwaway git identity and config, transport lockdown, and credential stripping."
 generated: true
 nav_group: "API Reference"
 nav_order: 3

@@ -1,6 +1,6 @@
 ---
 title: python.src.stricttest.pushguard
-description: "The structural push guard: classification of local versus non-local git remotes, and the subprocess.Popen wrapper that fails a test attempting a real remote push."
+description: "The structural push guard: classifying local versus non-local git remotes, and the subprocess.Popen wrapper that fails a test attempting a real push."
 generated: true
 nav_group: "API Reference"
 nav_order: 5
