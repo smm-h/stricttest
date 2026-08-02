@@ -1,0 +1,142 @@
+"""Configuration surface: required safety keys, closed enums, contradictions."""
+
+from __future__ import annotations
+
+import pytest
+
+from stricttest import config
+
+OK_TEST = "def test_ok():\n    assert True\n"
+
+
+def test_missing_every_safety_key_aborts(inner):
+    """Plugin presence IS adoption: an undeclared stance aborts the session."""
+    inner.write({"test_ok.py": OK_TEST}, omit=tuple(config.REQUIRED_KEYS))
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert "installing it IS adoption" in combined
+    for key in config.REQUIRED_KEYS:
+        assert key in combined
+    # No test ran: the abort happens before collection.
+    assert "1 passed" not in combined
+
+
+@pytest.mark.parametrize("key", config.REQUIRED_KEYS)
+def test_each_safety_key_is_individually_required(inner, key):
+    inner.write({"test_ok.py": OK_TEST}, omit=(key,))
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert f"Missing required ini key(s): {key}" in combined
+
+
+def test_empty_allowlists_count_as_declared(inner):
+    """An explicitly-empty list is a stance; only absence is undeclared."""
+    inner.write({"test_ok.py": OK_TEST})
+    inner.run("-q").assert_outcomes(passed=1)
+
+
+def test_unknown_socket_stance_rejected(inner):
+    inner.write({"test_ok.py": OK_TEST}, ini={"stricttest_sockets": "sometimes"})
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert "stricttest_sockets' must be one of deny, allowlist" in combined
+
+
+def test_unknown_loopback_stance_rejected(inner):
+    inner.write({"test_ok.py": OK_TEST}, ini={"stricttest_loopback": "maybe"})
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert "stricttest_loopback' must be one of deny, allow" in combined
+
+
+def test_deny_plus_allowlist_is_a_contradiction(inner):
+    """Allowlist entries are never silently ignored."""
+    inner.write(
+        {"test_ok.py": OK_TEST},
+        ini={
+            "stricttest_sockets": "deny",
+            "stricttest_socket_allowlist": ["example.com:443"],
+        },
+    )
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert "contradict each other" in combined
+
+
+def test_malformed_allowlist_entry_rejected(inner):
+    inner.write(
+        {"test_ok.py": OK_TEST},
+        ini={
+            "stricttest_sockets": "allowlist",
+            "stricttest_socket_allowlist": ["example.com"],
+        },
+    )
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert "is not a 'host:port' pair" in combined
+
+
+def test_zero_threshold_rejected_in_favour_of_the_sandbox_stance(inner):
+    inner.write(
+        {"test_ok.py": OK_TEST},
+        ini={"stricttest_threshold": "0", "stricttest_sandbox_required": "true"},
+    )
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert "stricttest_threshold' must be >= 1" in combined
+
+
+def test_non_integer_threshold_rejected(inner):
+    inner.write({"test_ok.py": OK_TEST}, ini={"stricttest_threshold": "many"})
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert "stricttest_threshold' must be an integer" in combined
+
+
+def test_non_boolean_sandbox_stance_rejected(inner):
+    inner.write({"test_ok.py": OK_TEST}, ini={"stricttest_sandbox_required": "sorta"})
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert "must be a boolean" in combined
+
+
+# ---------------------------------------------------------------------------
+# host:port parsing (pure)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "entry,expected",
+    [
+        ("example.com:443", ("example.com", "443")),
+        ("127.0.0.1:5432", ("127.0.0.1", "5432")),
+        ("[::1]:5432", ("::1", "5432")),
+        ("  example.com:80  ", ("example.com", "80")),
+    ],
+)
+def test_parse_host_port(entry, expected):
+    assert config.parse_host_port(entry) == expected
+
+
+@pytest.mark.parametrize("entry", ["example.com", "example.com:", ":443", "::1:5432"])
+def test_parse_host_port_rejects_garbage(entry):
+    with pytest.raises(pytest.UsageError):
+        config.parse_host_port(entry)
+
+
+def test_default_threshold_is_fifty():
+    """The rlsbl floor's threshold is the shipped default."""
+    assert config.DEFAULT_THRESHOLD == 50
+
+
+def test_default_sandbox_env_var_name():
+    assert config.DEFAULT_SANDBOX_ENV == "STRICTTEST_SANDBOX"

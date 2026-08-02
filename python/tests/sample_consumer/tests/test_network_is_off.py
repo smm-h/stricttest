@@ -1,0 +1,20 @@
+"""The consumer's network-touching code path is refused, loudly."""
+
+from __future__ import annotations
+
+import pytest
+from stricttest import NetworkBlocked
+
+import acme
+
+
+def test_fetching_release_metadata_is_refused():
+    with pytest.raises(NetworkBlocked) as excinfo:
+        acme.fetch_release_metadata("https://api.github.com/repos/smm-h/stricttest")
+    assert "BLOCKED" in str(excinfo.value)
+
+
+def test_the_refusal_names_the_remediation():
+    with pytest.raises(NetworkBlocked) as excinfo:
+        acme.fetch_release_metadata("https://pypi.org/pypi/stricttest/json")
+    assert "stricttest_socket_allowlist" in str(excinfo.value)
