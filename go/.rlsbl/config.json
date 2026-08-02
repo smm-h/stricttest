@@ -7,7 +7,9 @@
     "go": {
       "type": "go",
       "local": false,
-      "artifact": "library"
+      "artifact": "library",
+      "target": "go"
     }
-  }
+  },
+  "changelog_format_version_enforced": true
 }
