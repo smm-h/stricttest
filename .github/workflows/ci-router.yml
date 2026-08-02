@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       stricttest: ${{ steps.changes.outputs.stricttest }}
+      go-stricttest: ${{ steps.changes.outputs.go-stricttest }}
     steps:
     - uses: actions/checkout@v6
     - uses: dorny/paths-filter@v4
@@ -23,6 +24,10 @@ jobs:
           stricttest:
             - 'python/**'
             - 'python/**'
+            - 'LICENSE'
+          go-stricttest:
+            - 'go/**'
+            - 'go/**'
             - 'LICENSE'
   stricttest-ci-test:
     runs-on: ubuntu-latest
@@ -48,3 +53,20 @@ jobs:
     needs:
     - detect
     if: needs.detect.outputs.stricttest == 'true'
+  go-stricttest-ci-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      # go.mod: go 1.25.0
+    - uses: actions/setup-go@v6
+      with:
+        go-version-file: go/go.mod
+    - run: go vet ./...
+    - run: go test ./... -race -short -timeout=10m
+    defaults:
+      run:
+        working-directory: go
+    name: go-stricttest-ci / test
+    needs:
+    - detect
+    if: needs.detect.outputs.go-stricttest == 'true'
