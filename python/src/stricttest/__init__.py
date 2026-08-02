@@ -10,11 +10,9 @@ from .socketguard import NetworkBlocked, Policy
 
 __version__ = "0.1.0"
 
-__all__ = [
-    "PRESERVE_VARS",
-    "REQUIRED_KEYS",
-    "NetworkBlocked",
-    "Policy",
-    "Settings",
-    "__version__",
-]
+# No ``__all__`` here on purpose. Every name above is defined -- and documented
+# -- on its own module's API-reference page; re-listing them here would make the
+# package root claim them a second time, double-counting them in documentation
+# coverage. The re-exports themselves are the public import path
+# (``from stricttest import NetworkBlocked``) and are covered by the suite.
+_REEXPORTS = (PRESERVE_VARS, REQUIRED_KEYS, Settings, NetworkBlocked, Policy)
