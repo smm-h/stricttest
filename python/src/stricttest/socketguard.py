@@ -50,7 +50,7 @@ class Policy:
     unix_allowlist: tuple[str, ...]
 
     @classmethod
-    def from_settings(cls, settings: Settings) -> "Policy":
+    def from_settings(cls, settings: Settings) -> Policy:
         return cls(
             sockets=settings.sockets,
             loopback=settings.loopback,

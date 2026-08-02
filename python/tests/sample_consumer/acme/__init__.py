@@ -44,5 +44,5 @@ def publish(directory: Path, remote: str) -> None:
 
 def fetch_release_metadata(url: str) -> dict:
     """Fetch JSON over the network -- the thing tests must never really do."""
-    with urllib.request.urlopen(url, timeout=5) as response:  # noqa: S310
+    with urllib.request.urlopen(url, timeout=5) as response:
         return json.loads(response.read().decode())
