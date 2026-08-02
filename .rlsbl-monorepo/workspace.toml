@@ -1,0 +1,17 @@
+[[releasables]]
+name = "py-stricttest"
+
+[[releasables]]
+name = "go-stricttest"
+
+[[projects]]
+path = "python/"
+name = "stricttest"
+releasable = "py-stricttest"
+watch = ["python/**", "LICENSE"]
+
+[[projects]]
+path = "go/"
+name = "go-stricttest"
+releasable = "go-stricttest"
+watch = ["go/**", "LICENSE"]

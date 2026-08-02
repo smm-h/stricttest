@@ -1,0 +1,51 @@
+{
+  "version": "0.1.0",
+  "source": [
+    {
+      "path": "python/src/stricttest",
+      "language": "python"
+    },
+    {
+      "path": "go/hygiene",
+      "language": "go"
+    }
+  ],
+  "docs": "docs/",
+  "output": "docs/_build/",
+  "base_url": "https://docs.smmh.dev/stricttest",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "indexed": true
+    }
+  ],
+  "locales": [
+    {
+      "code": "en",
+      "label": "English",
+      "default": true
+    }
+  ],
+  "description": "An always-on test-isolation floor: a pytest plugin and a Go env-hygiene module that make a test suite structurally unable to reach real credentials, the real HOME, the network, or the development repository.",
+  "root_files": [
+    "docs/_README.md",
+    "docs/_CLAUDE.md"
+  ],
+  "topology": {
+    "slug": "stricttest",
+    "docs_base": "https://docs.smmh.dev",
+    "posts_base": "https://blog.smmh.dev",
+    "assembly": "smm-h/selfdoc-cache",
+    "projects": {
+      "rlsbl": "https://docs.smmh.dev/rlsbl",
+      "safegit": "https://docs.smmh.dev/safegit",
+      "saferm": "https://docs.smmh.dev/saferm",
+      "selfdoc": "https://docs.smmh.dev/selfdoc",
+      "strictcli": "https://docs.smmh.dev/strictcli",
+      "strictspec": "https://docs.smmh.dev/strictspec"
+    }
+  },
+  "assembly": {
+    "repo": "smm-h/selfdoc-cache"
+  }
+}
