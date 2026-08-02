@@ -1,6 +1,6 @@
 ---
 title: python.src.stricttest
-description: "The stricttest package root, re-exporting the surface a consumer asserts against: resolved settings, the closed preserve enum, required keys and the refusal type."
+description: "The stricttest package root, re-exporting what a consumer asserts against: resolved settings, the preserve enum, required keys and the refusal type."
 generated: true
 nav_group: "API Reference"
 nav_order: 1
