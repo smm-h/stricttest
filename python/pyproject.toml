@@ -32,7 +32,14 @@ packages = ["src/stricttest"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-stricttest_sockets = "off"
+# stricttest is active in its own suite through the pytest11 entry point, so
+# this project declares its safety stance like any other consumer.
+stricttest_sockets = "deny"
+stricttest_socket_allowlist = []
+stricttest_unix_socket_allowlist = []
+stricttest_loopback = "deny"
+# No sandbox runner exists in this repo yet; the runner ships as a scaffold
+# template from rlsbl. Flip to "true" at adoption.
 stricttest_sandbox_required = "false"
 
 [project.urls]

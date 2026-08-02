@@ -51,6 +51,23 @@ DEFAULT_TMP_PREFIX = "stricttest-env-"
 DEFAULT_GIT_USER_NAME = "stricttest"
 DEFAULT_GIT_USER_EMAIL = "stricttest@example.invalid"
 
+
+class _Missing:
+    """Sentinel default for every ini key.
+
+    Presence must be distinguishable from an explicitly-empty value: a project
+    that writes ``stricttest_socket_allowlist = []`` has declared its stance,
+    while one that omits the key has not. Registering this sentinel as each
+    key's default makes ``getini`` itself report presence, without reaching for
+    the deprecated ``config.inicfg``.
+    """
+
+    def __repr__(self) -> str:  # pragma: no cover - debugging aid
+        return "<stricttest: key not declared>"
+
+
+MISSING = _Missing()
+
 SOCKET_STANCES = ("deny", "allowlist")
 LOOPBACK_STANCES = ("deny", "allow")
 
@@ -99,7 +116,7 @@ def add_ini_options(parser) -> None:
         "REQUIRED. Socket stance for non-loopback addresses: 'deny' (no "
         "network at all) or 'allowlist' (only host:port pairs listed in "
         f"{KEY_SOCKET_ALLOWLIST}).",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_SOCKET_ALLOWLIST,
@@ -107,7 +124,7 @@ def add_ini_options(parser) -> None:
         "bracketed, e.g. '[::1]:5432'. Must be empty when "
         f"{KEY_SOCKETS} is 'deny'.",
         type="linelist",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_UNIX_SOCKET_ALLOWLIST,
@@ -115,70 +132,70 @@ def add_ini_options(parser) -> None:
         "'/' makes the entry a directory prefix; anything else is an exact "
         "path match.",
         type="linelist",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_LOOPBACK,
         "REQUIRED. Loopback stance, declared independently of "
         f"{KEY_SOCKETS}: 'allow' permits connects to 127.0.0.0/8, ::1 and "
         "'localhost'; 'deny' blocks them unless explicitly allowlisted.",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_SANDBOX_REQUIRED,
         "REQUIRED. 'true' enforces the bare-run threshold (a full-ish run "
         "must go through the sandbox runner); 'false' declares that this repo "
         "has no sandbox runner yet and disables the threshold entirely.",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_THRESHOLD,
         "Bare-run refusal threshold: a run collecting MORE than this many "
         f"tests outside the sandbox is refused. Default {DEFAULT_THRESHOLD}.",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_SANDBOX_ENV,
         "Name of the environment variable the sandbox runner sets to '1'. "
         f"Default {DEFAULT_SANDBOX_ENV}.",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_RUNNER_COMMAND,
         "Command shown in the bare-run refusal message. Default "
         f"{DEFAULT_RUNNER_COMMAND!r}.",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_TMP_PREFIX,
         "Prefix for the session's throwaway env directory. Default "
         f"{DEFAULT_TMP_PREFIX!r}.",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_GIT_USER_NAME,
         f"user.name written into the throwaway git config. Default "
         f"{DEFAULT_GIT_USER_NAME!r}.",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_GIT_USER_EMAIL,
         f"user.email written into the throwaway git config. Default "
         f"{DEFAULT_GIT_USER_EMAIL!r}.",
-        default=None,
+        default=MISSING,
     )
     parser.addini(
         KEY_PRESERVE,
         "Toolchain caches preserved across the HOME repoint, one closed-enum "
         "name per line. Valid names: " + ", ".join(sorted(PRESERVE_VARS)) + ".",
         type="linelist",
-        default=None,
+        default=MISSING,
     )
 
 
 def _present(config, key: str) -> bool:
     """True when ``key`` was actually written in the ini file."""
-    return key in (getattr(config, "inicfg", None) or {})
+    return config.getini(key) is not MISSING
 
 
 def _raw(config, key: str):
