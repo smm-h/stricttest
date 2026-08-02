@@ -1,0 +1,7 @@
+{
+  "publish_mode": "ci",
+  "changelog_format_version_enforced": true,
+  "batch_limits": {
+    "exclusions": []
+  }
+}
