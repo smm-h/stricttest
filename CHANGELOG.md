@@ -7,3 +7,9 @@
 ### Features
 
 - [stricttest] **New: the `stricttest` pytest plugin.** Installing it is adoption -- a `pytest11` entry point binds an always-on isolation floor before any conftest is imported: throwaway HOME/XDG dirs and git identity, transport lockdown, credential stripping, an audit-hook socket guard with host:port and unix-path allowlists, a `git push` guard, per-test cwd isolation, a TMPDIR-inside-the-repo refusal, and a bare-run threshold. Five safety keys in `[tool.pytest.ini_options]` are required; a missing one aborts the session.
+
+# go-stricttest
+
+## Unreleased
+
+- No user-facing changes.
