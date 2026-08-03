@@ -55,7 +55,23 @@ equivalent, and a partial guard would read as a guarantee.
 
 # ts-stricttest
 
-## Unreleased
+## 0.1.0
+
+First release of the stricttest npm package.
+
+<details>
+<summary>Context</summary>
+
+The Node member of the same floor, in the shape node:test allows: isolate(t)
+binds to a TestContext directly and undoes itself when the test finishes, and
+the package detects overlapping isolations rather than letting one test's HOME
+leak into another's. Bare-run refusal is a function the consumer calls, because
+node --test runs each test file in its own child process and an --import setup
+module can never learn how large the run is. Like the Go module it ships no
+socket guard, and no push guard either -- patching node:child_process is equally
+porous, and transport lockdown already closes the outcome.
+
+</details>
 
 ### Features
 
