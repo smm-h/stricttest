@@ -1,0 +1,15 @@
+{
+  "targets": [
+    "npm"
+  ],
+  "publish_mode": "ci",
+  "pipelines": {
+    "npm": {
+      "type": "npm",
+      "target": "npm",
+      "local": false,
+      "provenance": true
+    }
+  },
+  "changelog_format_version_enforced": true
+}
