@@ -1,12 +1,12 @@
 {
   "_hash_version": 3,
   "en/gen-index.md": {
-    "content": "b3229db219ebe07de85aef55f500263ace09561a0480db9f73c82389ee6c0e74",
-    "description": "349d8557a2a0262928889c55e0ed4649614e52b8fff7bfac903fd7988abb79d3"
+    "content": "d57ee5a55dff7222f29907cca717f3011e4bf5349149ad273e34e2d869229360",
+    "description": "491b38ef7140a630cb002bce0045bbaf0034dbfbd1fa9348961621955de2d452"
   },
   "en/go-hygiene.md": {
     "content": "5e3803e518940cecd8071876a257787abf940d242708341961142d830cad48e8",
-    "description": "24e3686b9b025c07e1d097f5ba3ea1f30cf7df6d343dc825aed591ec53ab7103",
+    "description": "3f8acba3d228f7bf0fdbb3bb7fae1ac9d13a207896bf5b5c51c3745b64f9f9d4",
     "source_docstring": "d61546585272cae072dab543e3944e4e910047f40a7687798bf012732b082026"
   },
   "en/python-src-stricttest-config.md": {
@@ -21,8 +21,7 @@
   },
   "en/python-src-stricttest-pgcluster.md": {
     "content": "b3c2c29301be1a065e69b2dce5ff0b34e9d3a5c28f0e7066038d674cc2e0dc80",
-    "description": "f9bdd946f387968f2acbe1ed5ed028ab732b86517b13ba14b6ebd93af0a875a7",
-    "seed_hash": "f9bdd946f387968f2acbe1ed5ed028ab732b86517b13ba14b6ebd93af0a875a7",
+    "description": "e3b8eeeea05341230bfd3035399f57055f5bc1fa1369a4f8e82a0abc6bffe3c8",
     "source_docstring": "b17bd3d8abcdd51723662c4fe3236835e2424b572ac821bf2122b374becd8a42"
   },
   "en/python-src-stricttest-plugin.md": {

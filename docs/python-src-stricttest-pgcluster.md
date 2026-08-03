@@ -1,8 +1,7 @@
 ---
 title: python.src.stricttest.pgcluster
-description: "An ephemeral PostgreSQL cluster for test suites."
+description: "An ephemeral PostgreSQL cluster for a test session: initdb onto tmpfs, a unix socket short enough for the kernel, and a throwaway database per test."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 4
 ---

@@ -1,6 +1,6 @@
 ---
 title: go/hygiene
-description: "The Go env-hygiene package: throwaway HOME, isolated git config and identity, transport lockdown, credential stripping and restoring chdir for Go suites."
+description: "The Go env-hygiene package: a throwaway HOME and XDG dirs, an isolated git config and identity, transport lockdown, credential stripping and a restoring chdir."
 generated: true
 nav_group: "API Reference"
 nav_order: 1
