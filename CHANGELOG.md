@@ -18,4 +18,7 @@
 
 ## Unreleased
 
-- No user-facing changes.
+### Features
+
+- [go-stricttest] **New: the `hygiene` package.** One `hygiene.Isolate(t)` call gives a Go test a throwaway `HOME`, an empty git config with a throwaway identity, `GIT_ALLOW_PROTOCOL=file`, and an environment stripped of every ambient credential -- all restored when the test ends. Granular helpers (`ThrowawayHome`, `IsolateGitConfig`, `LockdownTransports`, `StripCredentials`, `Chdir`) and a closed `Preserve` enum for toolchain caches ship alongside it.
+- [go-stricttest] **`ThrowawayHome` and `LockdownTransports` now cover more ground.** `ThrowawayHome` repoints `XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_CACHE_HOME` and `XDG_STATE_HOME` into the throwaway home as well as `HOME`, so a tool that reads the XDG dirs first (gh, for one) can no longer see the developer's real config or write into their real caches. `LockdownTransports` additionally pins `GIT_SSH_COMMAND` and `GIT_PROXY_COMMAND` to `/bin/false`, so lifting `GIT_ALLOW_PROTOCOL` no longer hands git the developer's real ssh key. This brings the Go module to parity with the Python floor.
