@@ -1,6 +1,6 @@
 ---
 title: python.src.stricttest.socketguard
-description: "The audit-hook network guard: host:port and unix-socket-path allowlists, an explicit loopback stance, and a refusal a broad except cannot swallow."
+description: "The audit-hook network guard: it refuses connects, datagram sends and name resolution, with host:port and unix-path allowlists and a loopback stance."
 generated: true
 nav_group: "API Reference"
 nav_order: 8
