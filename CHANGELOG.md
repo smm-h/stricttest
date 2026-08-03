@@ -16,7 +16,21 @@
 
 # go-stricttest
 
-## Unreleased
+## 0.1.0
+
+First release of the stricttest Go env-hygiene module.
+
+<details>
+<summary>Context</summary>
+
+Go has no plugin mechanism, so the floor ships as explicit helpers: one
+hygiene.Isolate(t) call gives a test a throwaway HOME and XDG directory set, an
+empty git config with a throwaway identity, transports locked to file://, and an
+environment stripped of every ambient credential -- all restored when the test
+ends. There is deliberately no socket guard: Go has no sys.addaudithook
+equivalent, and a partial guard would read as a guarantee.
+
+</details>
 
 ### Features
 
