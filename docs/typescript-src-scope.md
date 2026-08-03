@@ -1,8 +1,7 @@
 ---
 title: typescript/src/scope
-description: "The per-test isolation scope: what every helper in this package mutates through, and what undoes itself when the test finishes."
+description: "The per-test isolation scope: how every environment mutation is recorded and undone when the test ends, and how overlapping isolations are detected."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 5
 ---

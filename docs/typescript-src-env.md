@@ -1,8 +1,7 @@
 ---
 title: typescript/src/env
-description: "The environment floor: a throwaway home, an isolated git configuration and identity, transport lockdown, and credential stripping."
+description: "The Node env floor: a throwaway HOME and the four XDG dirs, an emptied git config with a throwaway identity, transport lockdown, credential stripping."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 1
 ---

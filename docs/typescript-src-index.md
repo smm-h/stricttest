@@ -1,8 +1,7 @@
 ---
 title: typescript/src/index
-description: "stricttest -- an always-on test-isolation floor for Node suites."
+description: "The stricttest npm package's public surface: an always-on test-isolation floor for Node suites, bound per test through node:test's TestContext."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 3
 ---

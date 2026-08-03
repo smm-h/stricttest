@@ -1,8 +1,7 @@
 ---
 title: typescript/src/sandbox
-description: "Bare-run refusal: a suite that is supposed to run inside the sandbox refuses to run outside it."
+description: "Bare-run refusal for Node suites: why the threshold is a function the consumer calls rather than a runner hook, and where the honest call sites are."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 4
 ---
