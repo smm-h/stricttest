@@ -27,7 +27,8 @@ installed, every session binds:
 - **Credential stripping.** GitHub, npm, PyPI, cargo, AWS, Cloudflare and model
   API tokens plus the SSH agent socket are removed from the environment.
 - **Socket guard.** A `sys.addaudithook` guard that refuses network connects,
-  with host:port and unix-socket-path allowlists. Default is network-off.
+  datagram sends and name resolution, with host:port and unix-socket-path
+  allowlists. Default is network-off.
 - **Push guard.** A real `git push` to a non-local remote fails the test at the
   `subprocess.Popen` boundary.
 - **Cwd isolation.** Every test runs chdir-ed into its own `tmp_path`, so an
@@ -115,8 +116,9 @@ func TestSomething(t *testing.T) {
 }
 ```
 
-One call gives the test a throwaway `HOME`, an empty git config with a throwaway
-identity, `GIT_ALLOW_PROTOCOL=file`, and an environment stripped of every
+One call gives the test a throwaway `HOME` and XDG directory set, an empty git
+config with a throwaway identity, `GIT_ALLOW_PROTOCOL=file` with git's ssh and
+proxy helpers pinned to `/bin/false`, and an environment stripped of every
 ambient credential -- all restored when the test ends. `ThrowawayHome`,
 `IsolateGitConfig`, `LockdownTransports`, `StripCredentials` and `Chdir` are
 exported individually, and `Preserve(hygiene.GoModCache, ...)` keeps the named
@@ -127,8 +129,11 @@ parallel test cannot own a process-wide variable like `HOME`. See
 
 ## Scope
 
-The socket guard sees connects made through Python's `socket` module. Network
-performed by a spawned subprocess (git, gh, psql) is invisible to it;
+The socket guard sees the connects, datagram sends and name resolution made
+through Python's `socket` module -- resolution included, because a DNS query for
+a forbidden host has already left the machine by the time a connect could be
+refused. Network performed by a spawned subprocess (git, gh, psql) is invisible
+to it;
 whole-process network isolation is the sandbox runner's job. The guard is the
 in-process floor beneath it, not a replacement for it.
 
