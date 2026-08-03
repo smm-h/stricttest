@@ -22,8 +22,10 @@ from stricttest.envfloor import CREDENTIAL_VARS
 GO_ROOT = Path(__file__).resolve().parents[2] / "go" / "hygiene"
 
 # GIT_ASKPASS is stripped by the Go floor and pinned to /bin/false by the Python
-# one, whose transport lockdown is wider. Pinning is strictly stronger than
-# unsetting, so this is the one deliberate difference between the lists.
+# one. Both floors otherwise lock transports down identically (GIT_ALLOW_PROTOCOL
+# plus a pinned GIT_SSH_COMMAND and GIT_PROXY_COMMAND), and either treatment
+# leaves git unable to obtain a credential, so this is the one deliberate
+# difference between the lists.
 GO_ONLY_CREDENTIAL_VARS = {"GIT_ASKPASS"}
 
 
