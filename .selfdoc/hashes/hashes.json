@@ -2,12 +2,12 @@
   "_hash_version": 3,
   "en/gen-index.md": {
     "content": "d57ee5a55dff7222f29907cca717f3011e4bf5349149ad273e34e2d869229360",
-    "description": "491b38ef7140a630cb002bce0045bbaf0034dbfbd1fa9348961621955de2d452"
+    "description": "03a716eb1ba6d4d52a05cd658d96eda0edc93984275e32b1e7f419694e9adaa0"
   },
   "en/go-hygiene.md": {
     "content": "5e3803e518940cecd8071876a257787abf940d242708341961142d830cad48e8",
-    "description": "3f8acba3d228f7bf0fdbb3bb7fae1ac9d13a207896bf5b5c51c3745b64f9f9d4",
-    "source_docstring": "d61546585272cae072dab543e3944e4e910047f40a7687798bf012732b082026"
+    "description": "ffbff62d7339208e338480534d35346f4fbe7dfea9b3e7ca2e33f5dd465f7445",
+    "source_docstring": "6e1817e4bd5b7a180f34824144449b27b06168cea3478b1c2c7be667aa5bd876"
   },
   "en/python-src-stricttest-config.md": {
     "content": "8ad381440557c1921683d7d0b53716b23839413525be720e5006ed79cdb1ae55",
@@ -41,8 +41,8 @@
   },
   "en/python-src-stricttest-socketguard.md": {
     "content": "0bcfeb40b65d5b26e468c65baf8e252a588f53b330ab329af26239a77983b38a",
-    "description": "ef9c619bde2041afcddfd173ebf3e0e59c333344f08abbf6baba499f15ef4d89",
-    "source_docstring": "34dda9ad3518d5d99eb80973db3134dd6634c067166d71f7e4e333bc5e31140c"
+    "description": "5c555cbbbefa8745a9d0bd1b20958ef73cb31cda441af1bf4aa0219550c4cd70",
+    "source_docstring": "5c4d8ec0f426719a958e68a1a590b9edfd45f491eb92a5d625eed3a9e111e2d1"
   },
   "en/python-src-stricttest.md": {
     "content": "d4061e4595e3e183cd916511bbb06f149302ece1701f34156cbc57de377b705f",
