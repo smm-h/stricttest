@@ -1,6 +1,6 @@
 {
 	"name": "stricttest",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"type": "module",
 	"description": "An always-on test-isolation floor for Node suites: throwaway HOME and XDG directories, an isolated git config and identity, transport lockdown, credential stripping, and sandbox enforcement",
 	"engines": {
