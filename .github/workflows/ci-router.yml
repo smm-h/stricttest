@@ -15,6 +15,7 @@ jobs:
     outputs:
       stricttest: ${{ steps.changes.outputs.stricttest }}
       go-stricttest: ${{ steps.changes.outputs.go-stricttest }}
+      ts-stricttest: ${{ steps.changes.outputs.ts-stricttest }}
     steps:
     - uses: actions/checkout@v6
     - uses: dorny/paths-filter@v4
@@ -25,6 +26,7 @@ jobs:
             - 'python/**'
             - 'python/**'
             - 'go/**'
+            - 'typescript/**'
             - 'LICENSE'
             - '.rlsbl-monorepo/releasables/py-stricttest/CHANGELOG.md'
           go-stricttest:
@@ -32,6 +34,11 @@ jobs:
             - 'go/**'
             - 'LICENSE'
             - '.rlsbl-monorepo/releasables/go-stricttest/CHANGELOG.md'
+          ts-stricttest:
+            - 'typescript/**'
+            - 'typescript/**'
+            - 'LICENSE'
+            - '.rlsbl-monorepo/releasables/ts-stricttest/CHANGELOG.md'
   stricttest-ci-test:
     runs-on: ubuntu-latest
     strategy:
@@ -73,3 +80,32 @@ jobs:
     needs:
     - detect
     if: needs.detect.outputs.go-stricttest == 'true'
+  ts-stricttest-ci-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # engines.node: >= 22 -- the scaffold's default matrix still lists 20,
+        # which this package genuinely cannot run on: `node --test` gained glob
+        # support in 21, and the test script passes one.
+        node-version: [22, 24]
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install dependencies
+      run: |
+        if [ -f package-lock.json ]; then
+          npm ci
+        else
+          npm install
+        fi
+    - run: npm test --if-present
+    - run: npm audit --audit-level=moderate || true
+    defaults:
+      run:
+        working-directory: typescript
+    name: ts-stricttest-ci / test
+    needs:
+    - detect
+    if: needs.detect.outputs.ts-stricttest == 'true'
