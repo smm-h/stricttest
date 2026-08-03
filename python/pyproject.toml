@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "stricttest"
-version = "0.1.0"
+version = "0.1.1"
 description = "Pytest plugin providing an always-on test-isolation floor: env poisoning, transport lockdown, credential stripping, socket guard, push guard, and sandbox enforcement"
 readme = "README.md"
 requires-python = ">=3.11"
