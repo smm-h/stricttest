@@ -62,10 +62,11 @@ type options struct {
 }
 
 // Isolate binds the full environment floor for the duration of t: the
-// preserved toolchain caches (if any) are pinned first, then HOME is repointed
-// at a throwaway directory, git's global and system config are emptied, the git
-// identity is replaced, transports are locked down to file://, and every
-// ambient credential variable is removed.
+// preserved toolchain caches (if any) are pinned first, then HOME and the four
+// XDG base directories are repointed at a throwaway directory, git's global and
+// system config are emptied, the git identity is replaced, transports are
+// locked down to file:// with git's ssh and proxy helpers pinned to a command
+// that always fails, and every ambient credential variable is removed.
 //
 // The throwaway home is not returned; call [ThrowawayHome] (which is memoized
 // per TB and returns the same directory Isolate created) when the path is

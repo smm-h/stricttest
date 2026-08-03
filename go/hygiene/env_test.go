@@ -60,8 +60,14 @@ func TestThrowawayHomeRepointsHomeAndRestoresIt(t *testing.T) {
 		if err != nil {
 			t.Fatalf("reading the throwaway home: %v", err)
 		}
-		if len(entries) != 0 {
-			t.Errorf("the throwaway home is not empty: %v", entries)
+		// Only the XDG directories the repoint creates -- nothing of the
+		// developer's own is copied or linked in.
+		for _, entry := range entries {
+			switch entry.Name() {
+			case ".config", ".cache", ".local":
+			default:
+				t.Errorf("the throwaway home carries an unexpected entry %q", entry.Name())
+			}
 		}
 	})
 
@@ -74,6 +80,72 @@ func TestThrowawayHomeRepointsHomeAndRestoresIt(t *testing.T) {
 	if _, err := os.Stat(home); !os.IsNotExist(err) {
 		t.Errorf("the throwaway home %q outlived its test (stat error: %v)", home, err)
 	}
+}
+
+func TestThrowawayHomeRepointsTheXdgDirectoriesAndRestoresThem(t *testing.T) {
+	poisoned := map[string]string{
+		"XDG_CONFIG_HOME": "/poisoned/config",
+		"XDG_DATA_HOME":   "/poisoned/data",
+		"XDG_CACHE_HOME":  "/poisoned/cache",
+		"XDG_STATE_HOME":  "/poisoned/state",
+	}
+	for name, value := range poisoned {
+		t.Setenv(name, value)
+	}
+
+	t.Run("during", func(t *testing.T) {
+		home := ThrowawayHome(t)
+		for name := range poisoned {
+			got := os.Getenv(name)
+			if !strings.HasPrefix(got, home+string(filepath.Separator)) {
+				t.Errorf("%s = %q, want a directory inside the throwaway home %q", name, got, home)
+			}
+			info, err := os.Stat(got)
+			if err != nil || !info.IsDir() {
+				t.Errorf("%s points at %q which is not an existing directory: %v", name, got, err)
+			}
+		}
+		// The four must not collapse onto one directory -- a tool that writes
+		// state where cache belongs is a real bug this floor should not hide.
+		distinct := map[string]bool{}
+		for name := range poisoned {
+			distinct[os.Getenv(name)] = true
+		}
+		if len(distinct) != len(poisoned) {
+			t.Errorf("the XDG directories are not distinct: %v", distinct)
+		}
+	})
+
+	for name, value := range poisoned {
+		if got := os.Getenv(name); got != value {
+			t.Errorf("%s = %q after the subtest, want the poisoned value %q back", name, got, value)
+		}
+	}
+}
+
+func TestThrowawayHomeXdgDirectoriesAreWhereGoWouldLookAnyway(t *testing.T) {
+	t.Run("during", func(t *testing.T) {
+		home := ThrowawayHome(t)
+		// A tool that ignores XDG_CONFIG_HOME and hardcodes ~/.config must land
+		// in the same throwaway place, so no code path escapes the repoint.
+		if got, want := os.Getenv("XDG_CONFIG_HOME"), filepath.Join(home, ".config"); got != want {
+			t.Errorf("XDG_CONFIG_HOME = %q, want the XDG default location %q", got, want)
+		}
+		reported, err := os.UserConfigDir()
+		if err != nil {
+			t.Fatalf("os.UserConfigDir: %v", err)
+		}
+		if reported != os.Getenv("XDG_CONFIG_HOME") {
+			t.Errorf("os.UserConfigDir() = %q, want the throwaway %q", reported, os.Getenv("XDG_CONFIG_HOME"))
+		}
+		cache, err := os.UserCacheDir()
+		if err != nil {
+			t.Fatalf("os.UserCacheDir: %v", err)
+		}
+		if cache != os.Getenv("XDG_CACHE_HOME") {
+			t.Errorf("os.UserCacheDir() = %q, want the throwaway %q", cache, os.Getenv("XDG_CACHE_HOME"))
+		}
+	})
 }
 
 func TestThrowawayHomeIsWhatGoItselfReportsAsTheHomeDirectory(t *testing.T) {
@@ -201,6 +273,54 @@ func TestLockdownTransportsAllowsOnlyFile(t *testing.T) {
 	if got := os.Getenv("GIT_ALLOW_PROTOCOL"); got != "" {
 		t.Errorf("GIT_ALLOW_PROTOCOL = %q after the subtest, want the previous value back", got)
 	}
+}
+
+func TestLockdownTransportsPinsTheSshAndProxyCommands(t *testing.T) {
+	poisoned := map[string]string{
+		"GIT_SSH_COMMAND":   "ssh -i /home/dev/.ssh/id_ed25519",
+		"GIT_PROXY_COMMAND": "/home/dev/bin/corkscrew",
+	}
+	for name, value := range poisoned {
+		t.Setenv(name, value)
+	}
+
+	t.Run("during", func(t *testing.T) {
+		LockdownTransports(t)
+		for name := range poisoned {
+			if got := os.Getenv(name); got != blockedCommand {
+				t.Errorf("%s = %q, want %q", name, got, blockedCommand)
+			}
+		}
+	})
+
+	for name, value := range poisoned {
+		if got := os.Getenv(name); got != value {
+			t.Errorf("%s = %q after the subtest, want the poisoned value %q back", name, got, value)
+		}
+	}
+}
+
+func TestRealGitRunsThePinnedSshCommandInsteadOfTheDevelopersSsh(t *testing.T) {
+	gitOrSkip(t)
+	t.Run("during", func(t *testing.T) {
+		Isolate(t)
+		// GIT_ALLOW_PROTOCOL already refuses ssh outright, which would mask the
+		// second layer entirely. Lifting it here is what makes this a test of
+		// the pinned GIT_SSH_COMMAND rather than a second test of the protocol
+		// list -- the two layers must each hold on their own.
+		t.Setenv("GIT_ALLOW_PROTOCOL", "ssh:file")
+
+		out, err := runGit(t, "ls-remote", "git@example.invalid:owner/repo.git")
+		if err == nil {
+			t.Fatalf("git reached an ssh remote under the transport lockdown:\n%s", out)
+		}
+		// The developer's real ssh announces itself ("ssh: Could not resolve
+		// hostname ..."). Under the pin, /bin/false runs instead and says
+		// nothing, so any ssh diagnostic means the pin did not take.
+		if strings.Contains(out, "ssh:") {
+			t.Errorf("the developer's real ssh ran despite the pinned GIT_SSH_COMMAND:\n%s", out)
+		}
+	})
 }
 
 func TestRealGitRefusesANonFileTransport(t *testing.T) {

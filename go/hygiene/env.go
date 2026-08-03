@@ -15,14 +15,20 @@ const (
 	identityEmail = "stricttest@example.invalid"
 )
 
+// blockedCommand is what every helper program git might reach for is pinned to.
+// It exists, it is executable, and it always fails -- so the transport dies at
+// the helper instead of reaching the network or a real credential.
+const blockedCommand = "/bin/false"
+
 // CredentialVars is the closed list of ambient credential vectors that
 // [StripCredentials] removes from the environment. A test that genuinely needs
 // one sets a FAKE value itself with TB.Setenv.
 //
-// The list mirrors the Python plugin's CREDENTIAL_VARS, plus GIT_ASKPASS: the
-// Python floor pins GIT_ASKPASS to /bin/false as part of its wider transport
-// lockdown, while this package's [LockdownTransports] is narrower, so the
-// variable is stripped here instead.
+// The list mirrors the Python plugin's CREDENTIAL_VARS, plus GIT_ASKPASS. That
+// one variable is the two floors' single deliberate divergence: the Python floor
+// pins it to /bin/false, while this package removes it here. Both close the same
+// door -- git cannot obtain a credential either way -- and a cross-language test
+// holds the rest of the two lists identical.
 var CredentialVars = []string{
 	"SSH_AUTH_SOCK",
 	"GIT_ASKPASS",
@@ -52,9 +58,29 @@ var (
 	homes = map[testing.TB]string{}
 )
 
-// ThrowawayHome repoints HOME and USERPROFILE at a fresh temporary directory
-// owned by t, and returns that directory. Both variables are restored when t
-// finishes, and the directory is removed with the rest of t's TempDir tree.
+// xdgDirs are the XDG base directories repointed alongside HOME, mapped to
+// their location relative to it.
+//
+// The relative paths are the XDG defaults on purpose: a tool that ignores the
+// environment variable and hardcodes ~/.config lands in the same throwaway
+// place, so no code path escapes the repoint.
+var xdgDirs = []struct{ env, rel string }{
+	{"XDG_CONFIG_HOME", ".config"},
+	{"XDG_DATA_HOME", ".local/share"},
+	{"XDG_CACHE_HOME", ".cache"},
+	{"XDG_STATE_HOME", ".local/state"},
+}
+
+// ThrowawayHome repoints HOME, USERPROFILE and the four XDG base directories
+// (XDG_CONFIG_HOME, XDG_DATA_HOME, XDG_CACHE_HOME, XDG_STATE_HOME) at a fresh
+// temporary directory owned by t, and returns that directory. Every variable is
+// restored when t finishes, and the directory is removed with the rest of t's
+// TempDir tree.
+//
+// The XDG directories are repointed as well as HOME because a great many tools
+// read them FIRST: a suite that moved only HOME would still let a tool read the
+// developer's real ~/.config (gh's hosts.yml lives there) and write into their
+// real caches.
 //
 // The call is memoized per TB: asking twice within the same test returns the
 // same directory rather than moving HOME again. Each subtest gets its own TB
@@ -71,6 +97,15 @@ func ThrowawayHome(t testing.TB) string {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	t.Setenv("USERPROFILE", home)
+
+	for _, dir := range xdgDirs {
+		path := filepath.Join(home, filepath.FromSlash(dir.rel))
+		if err := os.MkdirAll(path, 0o700); err != nil {
+			t.Fatalf("hygiene: creating the throwaway %s directory: %v", dir.env, err)
+			return home
+		}
+		t.Setenv(dir.env, path)
+	}
 
 	homesMu.Lock()
 	homes[t] = home
@@ -125,9 +160,18 @@ func IsolateGitConfig(t testing.TB) {
 // duration of t. Any ssh://, https:// or git:// URL a test reaches for -- a
 // real remote, a real fetch, a real push -- fails at the protocol check instead
 // of touching the network.
+//
+// GIT_SSH_COMMAND and GIT_PROXY_COMMAND are pinned to /bin/false as a second,
+// independent layer. The protocol list is the first line and would be enough on
+// its own, but a test (or a tool under test) that sets GIT_ALLOW_PROTOCOL
+// itself would lift it -- and then the developer's real ssh, with their real
+// key and their real proxy, is what git would run. Pinning both helpers means
+// that path dies at an executable that only ever fails.
 func LockdownTransports(t testing.TB) {
 	t.Helper()
 	t.Setenv("GIT_ALLOW_PROTOCOL", "file")
+	t.Setenv("GIT_SSH_COMMAND", blockedCommand)
+	t.Setenv("GIT_PROXY_COMMAND", blockedCommand)
 }
 
 // StripCredentials removes every variable in [CredentialVars] from the
