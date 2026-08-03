@@ -24,6 +24,7 @@ jobs:
           stricttest:
             - 'python/**'
             - 'python/**'
+            - 'go/**'
             - 'LICENSE'
             - '.rlsbl-monorepo/releasables/py-stricttest/CHANGELOG.md'
           go-stricttest:
