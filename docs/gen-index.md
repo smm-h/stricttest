@@ -19,3 +19,8 @@ order: 90
 - [python.src.stricttest.pushguard](python-src-stricttest-pushguard.html)
 - [python.src.stricttest.sandbox](python-src-stricttest-sandbox.html)
 - [python.src.stricttest.socketguard](python-src-stricttest-socketguard.html)
+- [typescript/src/env](typescript-src-env.html)
+- [typescript/src/hygiene](typescript-src-hygiene.html)
+- [typescript/src/index](typescript-src-index.html)
+- [typescript/src/sandbox](typescript-src-sandbox.html)
+- [typescript/src/scope](typescript-src-scope.html)

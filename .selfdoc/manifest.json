@@ -56,8 +56,33 @@
       "path": "python-src-stricttest.md",
       "title": "python.src.stricttest",
       "type": "doc"
+    },
+    {
+      "path": "typescript-src-env.md",
+      "title": "typescript/src/env",
+      "type": "doc"
+    },
+    {
+      "path": "typescript-src-hygiene.md",
+      "title": "typescript/src/hygiene",
+      "type": "doc"
+    },
+    {
+      "path": "typescript-src-index.md",
+      "title": "typescript/src/index",
+      "type": "doc"
+    },
+    {
+      "path": "typescript-src-sandbox.md",
+      "title": "typescript/src/sandbox",
+      "type": "doc"
+    },
+    {
+      "path": "typescript-src-scope.md",
+      "title": "typescript/src/scope",
+      "type": "doc"
     }
   ],
   "posts": [],
-  "last_gen": "2026-08-02T16:55:52.888835+00:00"
+  "last_gen": "2026-08-03T12:21:21.278104+00:00"
 }

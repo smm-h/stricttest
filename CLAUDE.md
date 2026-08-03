@@ -2,8 +2,8 @@
 
 # stricttest
 
-An always-on test-isolation floor: a pytest plugin (`python/`) and a Go
-env-hygiene module (`go/`).
+An always-on test-isolation floor: a pytest plugin (`python/`), a Go
+env-hygiene module (`go/`), and a Node env-hygiene package (`typescript/`).
 
 ## Layout
 
@@ -11,6 +11,7 @@ env-hygiene module (`go/`).
 |------|-----------|----------|-------|
 | `python/` | `py-stricttest` | PyPI (`stricttest`) | hatchling, src layout, `pytest11` entry point |
 | `go/` | `go-stricttest` | Go module proxy | `github.com/smm-h/stricttest/go`, library artifact |
+| `typescript/` | `ts-stricttest` | npm (`stricttest`) | ESM, Node >= 22, `node:test` |
 
 ## Rules for this repo
 
@@ -25,6 +26,15 @@ env-hygiene module (`go/`).
   floor off, no "warn instead of fail" mode. If a guard is wrong, fix the guard.
 - **Closed enums stay closed.** `stricttest_preserve` accepts only names in
   `PRESERVE_VARS`. Never accept a raw environment variable name.
+- **The three floors stay in lockstep.** The credential list and the preserve
+  enum are duplicated in Python, Go and TypeScript on purpose (each floor must
+  be readable on its own), and `python/tests/test_cross_language_parity.py`
+  reads the Go and TypeScript sources to prove they have not drifted. Changing
+  one list means changing all three in the same commit.
+- **Nothing half-guarded.** The socket guard exists only in Python because only
+  Python has `sys.addaudithook`. Never add a `net.Dial` or
+  `net.Socket.prototype.connect` patch to the Go module or the npm package: a
+  partial guard reads as a guarantee and is worse than none.
 - **Guards raise `BaseException` subclasses on purpose.** `NetworkBlocked` and
   `pytest.fail`'s `Failed` slip past production `except Exception` handlers so a
   swallowed refusal cannot become a silent pass. Do not "fix" this.
@@ -35,7 +45,8 @@ env-hygiene module (`go/`).
 
 ```bash
 cd python && uv run pytest        # plugin suite
-cd go && go build ./... && go vet ./...
+cd go && go test ./... -race
+cd typescript && npm test         # builds, type-checks, then node --test
 ```
 
 The plugin is active in its own suite via the entry point, so `python/pyproject.toml`
@@ -45,7 +56,7 @@ subprocess, because the audit hook is permanent for the life of a process.
 
 ## Release workflow
 
-This is an rlsbl monorepo with two releasables.
+This is an rlsbl monorepo with three releasables.
 
 - `rlsbl monorepo release init`, then edit `.rlsbl-monorepo/releases/unreleased.toml`
 - `rlsbl monorepo release run --no-allow-dirty --watch --yes`

@@ -48,5 +48,30 @@
     "content": "d4061e4595e3e183cd916511bbb06f149302ece1701f34156cbc57de377b705f",
     "description": "5d48c85fbd9cd4bc35515024b4dcf8160b10bf0c4142ea2fc2229dea437752df",
     "source_docstring": "857e927625ebb4a536259863a13f30a9f82ae7620259ba0a2ea8894ba27d34f0"
+  },
+  "en/typescript-src-env.md": {
+    "content": "83dd97bbffef8158329e1522f094497f2f360d1819a3f308710cd6860bbbf067",
+    "description": "feecd5ec4ae6e15b312e99a69fcb80d24e6eac73b777e5e5d70cbd0b64f248d3",
+    "seed_hash": "feecd5ec4ae6e15b312e99a69fcb80d24e6eac73b777e5e5d70cbd0b64f248d3"
+  },
+  "en/typescript-src-hygiene.md": {
+    "content": "2a820ba5b8a4dfe41a46999a6cb0db212236670e5f489332d67c2386e105254e",
+    "description": "4ab3ac451910ee6daf09c5a615091d89c5f664417d76f84516b8f2710fb97df3",
+    "seed_hash": "4ab3ac451910ee6daf09c5a615091d89c5f664417d76f84516b8f2710fb97df3"
+  },
+  "en/typescript-src-index.md": {
+    "content": "4354af8de8f0ca341a89d2197f52534f7d1a5f1dfe0080a63b769cbc55409849",
+    "description": "a1ba7ef9bd70007563f05ab46fbdad8cfbd534b4ff0a844cd04fa62249ec8156",
+    "seed_hash": "a1ba7ef9bd70007563f05ab46fbdad8cfbd534b4ff0a844cd04fa62249ec8156"
+  },
+  "en/typescript-src-sandbox.md": {
+    "content": "a56539002526294e7cdefce26fdcd09cd0c587a165475108f6940c6fddca1568",
+    "description": "22b9aeaf77ba803e8db07802c6f12180c9d6fab8684f15e4a3a97743f90afb2a",
+    "seed_hash": "22b9aeaf77ba803e8db07802c6f12180c9d6fab8684f15e4a3a97743f90afb2a"
+  },
+  "en/typescript-src-scope.md": {
+    "content": "39e7436fb979e6be3e4280ef3c08924cce45e64e509c6959d0f7461bc9079ac5",
+    "description": "8f5d528dd68edb84032cda7e07462a923cce7d0ac357f9793a047ca6a81763dd",
+    "seed_hash": "8f5d528dd68edb84032cda7e07462a923cce7d0ac357f9793a047ca6a81763dd"
   }
 }
