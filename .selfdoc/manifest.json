@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "name": "stricttest",
+  "slug": "stricttest",
+  "version": "0.1.0",
+  "description": "An always-on test-isolation floor: a pytest plugin and a Go env-hygiene module that make a test suite structurally unable to reach real credentials, the real HOME, the network, or the development repository.",
+  "language": "python",
+  "base_url": "https://docs.smmh.dev/stricttest",
+  "pages": [
+    {
+      "path": "gen-index.md",
+      "title": "API Reference",
+      "type": "doc"
+    },
+    {
+      "path": "go-hygiene.md",
+      "title": "go/hygiene",
+      "type": "doc"
+    },
+    {
+      "path": "python-src-stricttest-config.md",
+      "title": "python.src.stricttest.config",
+      "type": "doc"
+    },
+    {
+      "path": "python-src-stricttest-envfloor.md",
+      "title": "python.src.stricttest.envfloor",
+      "type": "doc"
+    },
+    {
+      "path": "python-src-stricttest-pgcluster.md",
+      "title": "python.src.stricttest.pgcluster",
+      "type": "doc"
+    },
+    {
+      "path": "python-src-stricttest-plugin.md",
+      "title": "python.src.stricttest.plugin",
+      "type": "doc"
+    },
+    {
+      "path": "python-src-stricttest-pushguard.md",
+      "title": "python.src.stricttest.pushguard",
+      "type": "doc"
+    },
+    {
+      "path": "python-src-stricttest-sandbox.md",
+      "title": "python.src.stricttest.sandbox",
+      "type": "doc"
+    },
+    {
+      "path": "python-src-stricttest-socketguard.md",
+      "title": "python.src.stricttest.socketguard",
+      "type": "doc"
+    },
+    {
+      "path": "python-src-stricttest.md",
+      "title": "python.src.stricttest",
+      "type": "doc"
+    }
+  ],
+  "posts": [],
+  "last_gen": "2026-08-02T16:55:52.888835+00:00"
+}

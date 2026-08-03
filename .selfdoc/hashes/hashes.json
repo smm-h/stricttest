@@ -1,0 +1,53 @@
+{
+  "_hash_version": 3,
+  "en/gen-index.md": {
+    "content": "b3229db219ebe07de85aef55f500263ace09561a0480db9f73c82389ee6c0e74",
+    "description": "349d8557a2a0262928889c55e0ed4649614e52b8fff7bfac903fd7988abb79d3"
+  },
+  "en/go-hygiene.md": {
+    "content": "5e3803e518940cecd8071876a257787abf940d242708341961142d830cad48e8",
+    "description": "24e3686b9b025c07e1d097f5ba3ea1f30cf7df6d343dc825aed591ec53ab7103",
+    "source_docstring": "d61546585272cae072dab543e3944e4e910047f40a7687798bf012732b082026"
+  },
+  "en/python-src-stricttest-config.md": {
+    "content": "8ad381440557c1921683d7d0b53716b23839413525be720e5006ed79cdb1ae55",
+    "description": "2cc55022b3db1f24e7dff5d5e467cc0749e073c350c0a6c053f6786f624c2137",
+    "source_docstring": "c81197d854022a835c66d8d11af7494b8cc319e58b50a0bb403a0662872a576c"
+  },
+  "en/python-src-stricttest-envfloor.md": {
+    "content": "72e96b0daa0a2b5e2c7b253f370ffe47cf99c415770b120f71b9b0af932ccb74",
+    "description": "708565f4cb3594d20c9968f13bc2d534c0eb8402d83fca04da01cc90c779535a",
+    "source_docstring": "ab4ae15b6ca9c03cf52e0a1bfe64a734c0c2a9f98e5152ca6b8a16b01bae87ed"
+  },
+  "en/python-src-stricttest-pgcluster.md": {
+    "content": "b3c2c29301be1a065e69b2dce5ff0b34e9d3a5c28f0e7066038d674cc2e0dc80",
+    "description": "f9bdd946f387968f2acbe1ed5ed028ab732b86517b13ba14b6ebd93af0a875a7",
+    "seed_hash": "f9bdd946f387968f2acbe1ed5ed028ab732b86517b13ba14b6ebd93af0a875a7",
+    "source_docstring": "b17bd3d8abcdd51723662c4fe3236835e2424b572ac821bf2122b374becd8a42"
+  },
+  "en/python-src-stricttest-plugin.md": {
+    "content": "e9b91a4876f9b13a514cb5788f2e61bb3d7b94cf7b50014759a0cbe3b9745d4e",
+    "description": "714102da6e0c2b9bdaee83b53f0a240fa4dbdd8411f82072218eeb5dabc07f33",
+    "source_docstring": "7ec7e13bead7efb0a386ce29f33078d34868178081145a5f5d1f4ea25983eea2"
+  },
+  "en/python-src-stricttest-pushguard.md": {
+    "content": "3930283834d00094cf6b1ad8fec8aecc2e19cf0e8c7bc9dc4ce42f663819b96a",
+    "description": "f9467b2a82e3be01957c2d5fa2571f2b467c7298264311903612a58a7e750b91",
+    "source_docstring": "ed3e90370a929f210d7f38499ede64dc1aabf9ac15c2cfdddefeadc732d576ac"
+  },
+  "en/python-src-stricttest-sandbox.md": {
+    "content": "781cd1b6af34aaf4bf2dea7cf08336ead032263e01e6d3595ac29425ee31399b",
+    "description": "aaaddc44d08c4ece3c3f4075d37340fd4faa0d19c9e5a43554a3d5bee30e5002",
+    "source_docstring": "e6d333e52e1c4082ac38c609996d0d8fa16f078fc215f5d655230843cfc6e684"
+  },
+  "en/python-src-stricttest-socketguard.md": {
+    "content": "0bcfeb40b65d5b26e468c65baf8e252a588f53b330ab329af26239a77983b38a",
+    "description": "ef9c619bde2041afcddfd173ebf3e0e59c333344f08abbf6baba499f15ef4d89",
+    "source_docstring": "34dda9ad3518d5d99eb80973db3134dd6634c067166d71f7e4e333bc5e31140c"
+  },
+  "en/python-src-stricttest.md": {
+    "content": "d4061e4595e3e183cd916511bbb06f149302ece1701f34156cbc57de377b705f",
+    "description": "5d48c85fbd9cd4bc35515024b4dcf8160b10bf0c4142ea2fc2229dea437752df",
+    "source_docstring": "857e927625ebb4a536259863a13f30a9f82ae7620259ba0a2ea8894ba27d34f0"
+  }
+}
