@@ -1,10 +1,32 @@
 [releasables.py-stricttest]
 # Version bump type: patch, minor, major, infra, or prerelease
-bump = ""
+bump = "infra"
 # Short description of this release (required)
-description = ""
+description = "Fix the CI router paths filter so a batch release's tagged commit runs every project's test suite"
 # Optional context explaining why these changes were made
-context = ""
+context = """
+The 0.1.0 batch release published only npm and the Go module proxy. PyPI never
+got a build at all, because the publish gate hard-failed for py-stricttest and
+go-stricttest.
+
+Cause: a batch release pushes each releasable's candidate in a separate push and
+lands every tag on the final "snapshot" commit. That commit (dd7e3a9) touches
+only .rlsbl-monorepo/snapshot.json, which no project's paths filter matched, so
+the CI router ran only ts-stricttest's suite on it and reported
+"stricttest-ci / test: skipped" and "go-stricttest-ci / test: skipped". The
+publish gate refuses to treat a skipped check as passing -- correctly -- so the
+Python and Go publish jobs failed while the TypeScript one succeeded, purely
+because ts-stricttest's own release commit happened to ride in the same push
+window.
+
+The fix adds .rlsbl-monorepo/snapshot.json and
+.rlsbl-monorepo/releasables/<name>/** to every project's watch patterns, so the
+commit a batch release actually tags now triggers all three suites.
+
+This release is the proof: it runs the whole pipeline end to end and resyncs all
+three releasables to 0.1.1. npm 0.1.0 is burned and superseded; PyPI gets its
+first publish here.
+"""
 # Pre-release channel: alpha, beta, rc, or stable (ordered;
 # demotion is an error). Per package, so one workspace release
 # can ship some packages stable and others as alphas. See
@@ -13,18 +35,40 @@ context = ""
 include = ["pypi"]
 exclude = []
 
-# go-stricttest: no unreleased commits since go/v0.1.0
-# [releasables.go-stricttest]
-# bump = ""
-# description = ""
-# context = ""
-# include = ["go"]
-# exclude = []
+[releasables.go-stricttest]
+bump = "infra"
+description = "Fix the CI router paths filter so a batch release's tagged commit runs every project's test suite"
+context = """
+The 0.1.0 batch release landed every releasable's tag on the final "snapshot"
+commit, which touches only .rlsbl-monorepo/snapshot.json. No project's paths
+filter matched that file, so the CI router reported
+"go-stricttest-ci / test: skipped" on the tagged commit and the publish gate
+refused to treat a skipped check as passing.
 
-# ts-stricttest: no unreleased commits since ts-stricttest@v0.1.0
-# [releasables.ts-stricttest]
-# bump = ""
-# description = ""
-# context = ""
-# include = ["npm"]
-# exclude = []
+The fix adds .rlsbl-monorepo/snapshot.json and
+.rlsbl-monorepo/releasables/<name>/** to every project's watch patterns, so the
+commit a batch release actually tags now triggers all three suites. This release
+runs the corrected pipeline end to end and resyncs all three releasables to
+0.1.1.
+"""
+include = ["go"]
+exclude = []
+
+[releasables.ts-stricttest]
+bump = "infra"
+description = "Fix the CI router paths filter so a batch release's tagged commit runs every project's test suite"
+context = """
+The 0.1.0 batch release landed every releasable's tag on the final "snapshot"
+commit, which touches only .rlsbl-monorepo/snapshot.json. ts-stricttest's gate
+passed only by luck -- its own release commit rode in the same push window, so
+its suite had run on that commit; the Python and Go gates saw a skipped check
+and hard-failed, leaving PyPI unpublished.
+
+The fix adds .rlsbl-monorepo/snapshot.json and
+.rlsbl-monorepo/releasables/<name>/** to every project's watch patterns, so the
+commit a batch release actually tags now triggers all three suites. This release
+runs the corrected pipeline end to end and resyncs all three releasables to
+0.1.1, superseding the burned npm 0.1.0.
+"""
+include = ["npm"]
+exclude = []
