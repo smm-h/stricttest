@@ -11,6 +11,11 @@ development repository -- not merely disciplined about avoiding them.
 |-----------|---------|----------|
 | **Pytest plugin** | `pip install stricttest` | [python/](python/) |
 | **Go env-hygiene module** | `go get github.com/smm-h/stricttest/go` | [go/](go/) |
+| **Node env-hygiene package** | `npm install --save-dev stricttest` | [typescript/](typescript/) |
+
+The three ship from one repository and a cross-language test holds their
+credential lists and preserve enums in lockstep, so a polyglot repo gets the
+same guarantee in every language it tests in.
 
 ## What the floor does
 
@@ -127,6 +132,37 @@ through `TB.Setenv`, which panics under `t.Parallel` -- intended, since a
 parallel test cannot own a process-wide variable like `HOME`. See
 [go/](go/) for details.
 
+## The npm package
+
+Node suites get the same environment floor, in the shape Node's runner allows:
+
+```ts
+import { test } from "node:test";
+import { isolate } from "stricttest";
+
+test("something", (t) => {
+	isolate(t);
+});
+```
+
+`node:test`'s `TestContext` is the cleanup registry the helpers bind to, so no
+adapter is needed; other runners need a one-line literal (`{ after:
+onTestFinished }` for vitest). The same pieces are exported individually --
+`throwawayHome`, `isolateGitConfig`, `lockdownTransports`, `stripCredentials`,
+`chdir` -- and `isolate(t, { preserve: ["goCache", ...] })` keeps the named
+toolchain caches pointing at the real home. Node offers no `TB.Setenv`
+equivalent, so the package detects the conflict directly: a test that finishes
+its isolation while another's is still open fails with an explanatory error
+rather than letting one test's `HOME` leak into another's.
+
+Bare-run refusal is a function the consumer calls, `requireSandbox`, because
+`node --test` runs each test file in its own child process and an `--import`ed
+setup module is loaded in those children, never in the parent that owns the run
+-- so a setup module can never learn how large the run is. The honest call sites
+are a programmatic runner entry (`policy: "threshold"`, with the file count it
+already has) or a setup module (`policy: "always"`, refusing every bare run).
+See [typescript/](typescript/) for details.
+
 ## Scope
 
 The socket guard sees the connects, datagram sends and name resolution made
@@ -137,9 +173,15 @@ to it;
 whole-process network isolation is the sandbox runner's job. The guard is the
 in-process floor beneath it, not a replacement for it.
 
-There is no socket guard in the Go module at all: Go has no `sys.addaudithook`
-equivalent, so network isolation for Go suites belongs entirely to the sandbox
-runner.
+There is no socket guard in the Go module or the npm package at all. Neither
+language has a `sys.addaudithook` equivalent -- an interception point the
+runtime itself calls and that cannot be removed once installed. The nearest
+substitutes (patching `net.Dial`, patching `net.Socket.prototype.connect`) miss
+datagrams, miss native code, and are undone by anything that re-imports the
+module, and a partial guard reads as a guarantee. Network isolation for Go and
+Node suites belongs entirely to the sandbox runner. The npm package omits a push
+guard for the same reason: patching `node:child_process` is equally porous, and
+transport lockdown already closes the outcome.
 
 ## License
 

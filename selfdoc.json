@@ -8,6 +8,10 @@
     {
       "path": "go/hygiene",
       "language": "go"
+    },
+    {
+      "path": "typescript/src",
+      "language": "typescript"
     }
   ],
   "docs": "docs/",
