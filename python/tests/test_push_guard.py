@@ -142,6 +142,73 @@ def test_named_remote_resolving_to_a_nonlocal_url_is_intercepted(tmp_path):
     assert "https://example.invalid/nope.git" in message
 
 
+# ---------------------------------------------------------------------------
+# Popen's cwd can arrive positionally. ``subprocess.run`` always passes it by
+# keyword, but a direct Popen caller need not -- and the guard resolves a bare
+# remote NAME by running ``git remote get-url`` in that cwd, so reading it from
+# the wrong place turns a local push into a refusal (or a real remote into an
+# unresolved None).
+# ---------------------------------------------------------------------------
+
+# Popen.__init__(args, bufsize, executable, stdin, stdout, stderr, preexec_fn,
+#                close_fds, shell, cwd, ...) -- cwd is the 9th after ``args``.
+def _popen_with_positional_cwd(cmd, cwd):
+    return subprocess.Popen(
+        cmd,
+        -1,  # bufsize
+        None,  # executable
+        None,  # stdin
+        subprocess.PIPE,  # stdout
+        subprocess.PIPE,  # stderr
+        None,  # preexec_fn
+        True,  # close_fds
+        False,  # shell
+        str(cwd),  # cwd
+    )
+
+
+def _work_repo_with_origin(tmp_path, origin: str):
+    work = tmp_path / "work"
+    work.mkdir()
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=work, check=True)
+    (work / "f.txt").write_text("x")
+    subprocess.run(["git", "add", "f.txt"], cwd=work, check=True)
+    subprocess.run(["git", "commit", "-qm", "x"], cwd=work, check=True)
+    subprocess.run(["git", "remote", "add", "origin", origin], cwd=work, check=True)
+    return work
+
+
+def test_positional_cwd_resolves_a_named_local_remote(tmp_path):
+    """A positional cwd must still find the repo whose remote is local."""
+    bare = tmp_path / "bare.git"
+    subprocess.run(["git", "init", "-q", "--bare", str(bare)], check=True)
+    work = _work_repo_with_origin(tmp_path, str(bare))
+
+    proc = _popen_with_positional_cwd(["git", "push", "-q", "origin", "main"], work)
+    proc.communicate(timeout=30)
+    assert proc.returncode == 0
+
+    out = subprocess.run(
+        ["git", "log", "-1", "--format=%s", "main"],
+        cwd=bare,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert out.stdout.strip() == "x"
+
+
+def test_positional_cwd_resolves_a_named_nonlocal_remote(tmp_path):
+    """And the refusal names the URL it resolved, not an unresolved None."""
+    work = _work_repo_with_origin(tmp_path, "https://example.invalid/nope.git")
+
+    with pytest.raises(BaseException) as excinfo:
+        _popen_with_positional_cwd(["git", "push", "origin", "main"], work)
+    message = str(excinfo.value)
+    assert "resolved_url='https://example.invalid/nope.git'" in message
+    assert f"cwd={str(work)!r}" in message
+
+
 def test_non_git_commands_pass_through():
     out = subprocess.run(["echo", "push"], capture_output=True, text=True)
     assert out.stdout.strip() == "push"
