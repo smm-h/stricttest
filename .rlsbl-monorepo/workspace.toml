@@ -7,6 +7,23 @@ name = "go-stricttest"
 [[releasables]]
 name = "ts-stricttest"
 
+# Every project watches ".rlsbl-monorepo/snapshot.json" and its own releasable
+# directory. Both are release machinery, not source, and watching them is what
+# keeps the publish gate satisfiable.
+#
+# A batch release pushes a "snapshot" commit LAST and puts every releasable's
+# tag on it. That commit touches only snapshot.json, so without it in the watch
+# list the paths filter skips every project's CI job on exactly the commit the
+# tags point at -- and the publish gate, which refuses to treat a skipped check
+# as passing, can then never be satisfied for any releasable. That is what
+# happened on the 0.1.0 batch: only ts-stricttest's job ran on the tagged
+# commit (its release commit rode in the same push window), so the py and go
+# publish gates failed with "CI did not pass".
+#
+# The releasable directory is watched for the same reason one step earlier: a
+# single-releasable release lands its tag on a release or finalize-changelog
+# commit that touches only files under .rlsbl-monorepo/releasables/<name>/.
+
 [[projects]]
 path = "python/"
 name = "stricttest"
@@ -16,16 +33,33 @@ releasable = "py-stricttest"
 # fail when the three floors' variable lists drift. They live in the Python
 # suite, so a Go-only or Node-only change must trigger it -- otherwise the one
 # test that catches drift is exactly the test such a PR never runs.
-watch = ["python/**", "go/**", "typescript/**", "LICENSE"]
+watch = [
+    "python/**",
+    "go/**",
+    "typescript/**",
+    "LICENSE",
+    ".rlsbl-monorepo/snapshot.json",
+    ".rlsbl-monorepo/releasables/py-stricttest/**",
+]
 
 [[projects]]
 path = "go/"
 name = "go-stricttest"
 releasable = "go-stricttest"
-watch = ["go/**", "LICENSE"]
+watch = [
+    "go/**",
+    "LICENSE",
+    ".rlsbl-monorepo/snapshot.json",
+    ".rlsbl-monorepo/releasables/go-stricttest/**",
+]
 
 [[projects]]
 path = "typescript/"
 name = "ts-stricttest"
 releasable = "ts-stricttest"
-watch = ["typescript/**", "LICENSE"]
+watch = [
+    "typescript/**",
+    "LICENSE",
+    ".rlsbl-monorepo/snapshot.json",
+    ".rlsbl-monorepo/releasables/ts-stricttest/**",
+]
