@@ -7,3 +7,9 @@
 ### Features
 
 - [stricttest] **New: the `stricttest` pytest plugin.** Installing it is adoption -- a `pytest11` entry point binds an always-on isolation floor before any conftest is imported: throwaway HOME/XDG dirs and git identity, transport lockdown, credential stripping, an audit-hook socket guard with host:port and unix-path allowlists, a `git push` guard, per-test cwd isolation, a TMPDIR-inside-the-repo refusal, and a bare-run threshold. Five safety keys in `[tool.pytest.ini_options]` are required; a missing one aborts the session.
+- [stricttest] **New: `stricttest.pgcluster`.** An ephemeral PostgreSQL cluster for test suites: `ephemeral_cluster(dsn_env=...)` boots a real postmaster on tmpfs with `fsync=off` in well under a second, exports its libpq URL under the environment variable your application reads, and hands out throwaway per-test databases via `cluster.database()`. The kernel's 107-byte unix-socket limit is checked before anything starts, and binary discovery covers the plain `/usr/bin` layout as well as versioned ones.
+
+### Fixes
+
+- [stricttest] **Fix: the socket guard no longer leaks DNS queries or UDP datagrams.** `socket.gethostbyname`, `socket.gethostbyname_ex`, `socket.gethostbyaddr`, `socket.getfqdn` and `socket.sendmsg` raise their own audit events and were not watched, so under `stricttest_sockets = deny` a real resolver query and a real UDP packet still left the machine. All five are now refused, and the loopback and allowlist carve-outs apply to them like every other event.
+- [stricttest] **Fix: the missing-safety-keys abort now prints a snippet you can actually paste.** It always emitted TOML, so a project configured through `pytest.ini`, `tox.ini` or `setup.cfg` got a `[tool.pytest.ini_options]` block with quoted values -- pasting it verbatim produced a second error. The snippet now matches the syntax of the ini file pytest actually resolved.
