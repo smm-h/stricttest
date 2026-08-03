@@ -1,0 +1,29 @@
+{
+  "items": [
+    {
+      "base_version": "0.1.0",
+      "bump": "minor",
+      "name": "py-stricttest",
+      "registry": "pypi",
+      "tag": "py-stricttest@v0.1.0",
+      "target_version": "0.1.0"
+    },
+    {
+      "base_version": "0.1.0",
+      "bump": "minor",
+      "name": "go-stricttest",
+      "registry": "go",
+      "tag": "go-stricttest@v0.1.0",
+      "target_version": "0.1.0"
+    },
+    {
+      "base_version": "0.1.0",
+      "bump": "minor",
+      "name": "ts-stricttest",
+      "registry": "npm",
+      "tag": "ts-stricttest@v0.1.0",
+      "target_version": "0.1.0"
+    }
+  ],
+  "section_type": "releasables"
+}
