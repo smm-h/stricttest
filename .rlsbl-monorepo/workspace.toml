@@ -8,7 +8,11 @@ name = "go-stricttest"
 path = "python/"
 name = "stricttest"
 releasable = "py-stricttest"
-watch = ["python/**", "LICENSE"]
+# "go/**" is deliberate: the cross-language parity tests (tests/test_go_parity.py)
+# read the Go source and fail when the two floors' variable lists drift. They
+# live in the Python suite, so a Go-only change must trigger it -- otherwise the
+# one test that catches drift is exactly the test a Go-only PR never runs.
+watch = ["python/**", "go/**", "LICENSE"]
 
 [[projects]]
 path = "go/"
