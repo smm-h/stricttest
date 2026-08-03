@@ -1,44 +1,47 @@
 [releasables.py-stricttest]
-# Version bump type: patch, minor, major, infra, or prerelease
-bump = ""
-# Short description of this release (required)
-description = ""
-# Optional context explaining why these changes were made
-context = ""
-# Pre-release channel: alpha, beta, rc, or stable (ordered;
-# demotion is an error). Per package, so one workspace release
-# can ship some packages stable and others as alphas. See
-# docs/release-workflow.md#the-pre-release-channel.
-# preid = ""
+# First release: 0.1.0 has never been tagged, so the bump type is ignored and
+# the current version ships as-is.
+bump = "minor"
+description = "First release of the stricttest pytest plugin."
+context = """
+Installing the plugin IS adoption: a pytest11 entry point binds an always-on
+isolation floor before any conftest module is imported -- throwaway HOME/XDG
+directories and git identity, transport lockdown, credential stripping, an
+audit-hook socket guard, a git push guard, per-test cwd isolation, a
+TMPDIR-inside-the-repo refusal, and a bare-run threshold -- plus an ephemeral
+PostgreSQL cluster launcher for suites that need a real database. Five safety
+keys are required in the pytest ini; a missing one aborts the session, because
+a suite that has not declared where it stands should not be allowed to run.
+"""
 include = ["pypi"]
 exclude = []
 
 [releasables.go-stricttest]
-# Version bump type: patch, minor, major, infra, or prerelease
-bump = ""
-# Short description of this release (required)
-description = ""
-# Optional context explaining why these changes were made
-context = ""
-# Pre-release channel: alpha, beta, rc, or stable (ordered;
-# demotion is an error). Per package, so one workspace release
-# can ship some packages stable and others as alphas. See
-# docs/release-workflow.md#the-pre-release-channel.
-# preid = ""
+bump = "minor"
+description = "First release of the stricttest Go env-hygiene module."
+context = """
+Go has no plugin mechanism, so the floor ships as explicit helpers: one
+hygiene.Isolate(t) call gives a test a throwaway HOME and XDG directory set, an
+empty git config with a throwaway identity, transports locked to file://, and an
+environment stripped of every ambient credential -- all restored when the test
+ends. There is deliberately no socket guard: Go has no sys.addaudithook
+equivalent, and a partial guard would read as a guarantee.
+"""
 include = ["go"]
 exclude = []
 
 [releasables.ts-stricttest]
-# Version bump type: patch, minor, major, infra, or prerelease
-bump = ""
-# Short description of this release (required)
-description = ""
-# Optional context explaining why these changes were made
-context = ""
-# Pre-release channel: alpha, beta, rc, or stable (ordered;
-# demotion is an error). Per package, so one workspace release
-# can ship some packages stable and others as alphas. See
-# docs/release-workflow.md#the-pre-release-channel.
-# preid = ""
+bump = "minor"
+description = "First release of the stricttest npm package."
+context = """
+The Node member of the same floor, in the shape node:test allows: isolate(t)
+binds to a TestContext directly and undoes itself when the test finishes, and
+the package detects overlapping isolations rather than letting one test's HOME
+leak into another's. Bare-run refusal is a function the consumer calls, because
+node --test runs each test file in its own child process and an --import setup
+module can never learn how large the run is. Like the Go module it ships no
+socket guard, and no push guard either -- patching node:child_process is equally
+porous, and transport lockdown already closes the outcome.
+"""
 include = ["npm"]
 exclude = []
