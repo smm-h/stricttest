@@ -45,6 +45,28 @@ def render_pyproject(ini: dict[str, object]) -> str:
     return "\n".join(lines) + "\n"
 
 
+# The ini-file names pytest reads, mapped to the section header each one uses.
+# ``pytest.ini`` outranks ``pyproject.toml`` in pytest's own discovery order, so
+# writing one is enough to make it the session's inipath.
+INI_SECTIONS: dict[str, str] = {
+    "pytest.ini": "[pytest]",
+    "tox.ini": "[pytest]",
+    "setup.cfg": "[tool:pytest]",
+}
+
+
+def render_ini(filename: str, ini: dict[str, object]) -> str:
+    """Render settings in classic ini syntax: unquoted values, one per line."""
+    lines = [INI_SECTIONS[filename]]
+    for key, value in ini.items():
+        if isinstance(value, list):
+            joined = "".join(f"\n    {v}" for v in value)
+            lines.append(f"{key} ={joined}")
+        else:
+            lines.append(f"{key} = {value}")
+    return "\n".join(lines) + "\n"
+
+
 @dataclass
 class InnerProject:
     """A generated consumer project plus the ability to run pytest inside it."""
@@ -57,12 +79,29 @@ class InnerProject:
         files: dict[str, str],
         ini: dict[str, object] | None = None,
         omit: tuple[str, ...] = (),
+        ini_filename: str = "pyproject.toml",
+        raw_ini: str | None = None,
     ) -> None:
+        """Generate the consumer project.
+
+        ``ini_filename`` selects which of pytest's ini files carries the
+        settings, because the remediation the plugin prints has to match the
+        syntax of the file the project actually uses. ``raw_ini`` writes that
+        file verbatim instead of rendering ``ini`` -- what a consumer pasting
+        the plugin's own snippet does.
+        """
         merged = dict(SAFE_DEFAULTS)
         merged.update(ini or {})
         for key in omit:
             merged.pop(key, None)
-        self.pytester.makepyprojecttoml(render_pyproject(merged))
+        if ini_filename == "pyproject.toml":
+            self.pytester.makepyprojecttoml(
+                raw_ini if raw_ini is not None else render_pyproject(merged)
+            )
+        else:
+            (self.pytester.path / ini_filename).write_text(
+                raw_ini if raw_ini is not None else render_ini(ini_filename, merged)
+            )
         for name, source in files.items():
             path = self.pytester.path / name
             path.parent.mkdir(parents=True, exist_ok=True)

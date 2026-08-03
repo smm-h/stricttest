@@ -110,6 +110,61 @@ def test_non_boolean_sandbox_stance_rejected(inner):
 
 
 # ---------------------------------------------------------------------------
+# The remediation snippet must be pasteable into the project's OWN ini file.
+# ---------------------------------------------------------------------------
+
+
+def test_remediation_snippet_is_toml_for_a_pyproject(inner):
+    inner.write({"test_ok.py": OK_TEST}, omit=tuple(config.REQUIRED_KEYS))
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert "[tool.pytest.ini_options]" in combined
+    assert 'stricttest_sockets = "deny"' in combined
+
+
+@pytest.mark.parametrize(
+    "filename,header",
+    [("pytest.ini", "[pytest]"), ("setup.cfg", "[tool:pytest]")],
+)
+def test_remediation_snippet_is_ini_syntax_for_an_ini_file(inner, filename, header):
+    """A TOML block pasted into pytest.ini is a second error, not a fix."""
+    inner.write(
+        {"test_ok.py": OK_TEST},
+        omit=tuple(config.REQUIRED_KEYS),
+        ini_filename=filename,
+    )
+    result = inner.run("-q")
+    assert result.ret != 0
+    combined = "\n".join(result.outlines + result.errlines)
+    assert header in combined
+    assert "[tool.pytest.ini_options]" not in combined
+    # Unquoted: ini values are literal text, and the quotes would end up in
+    # the value.
+    assert "stricttest_sockets = deny" in combined
+    assert 'stricttest_sockets = "deny"' not in combined
+
+
+@pytest.mark.parametrize(
+    "filename", ["pyproject.toml", "pytest.ini", "tox.ini", "setup.cfg"]
+)
+def test_pasting_the_remediation_snippet_verbatim_makes_the_session_run(
+    inner, filename
+):
+    """The end-to-end contract: paste what the abort printed, and it works."""
+    from pathlib import Path
+
+    snippet = config.remediation_block(Path(filename))
+    inner.write({"test_ok.py": OK_TEST}, ini_filename=filename, raw_ini=snippet)
+    inner.run("-q").assert_outcomes(passed=1)
+
+
+def test_remediation_block_falls_back_to_toml_without_an_ini_file():
+    """No ini file yet: pyproject.toml is what a new project should create."""
+    assert "[tool.pytest.ini_options]" in config.remediation_block(None)
+
+
+# ---------------------------------------------------------------------------
 # host:port parsing (pure)
 # ---------------------------------------------------------------------------
 

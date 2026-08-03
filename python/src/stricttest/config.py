@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 
@@ -242,10 +243,37 @@ def missing_required_keys(config) -> list[str]:
     return [key for key in REQUIRED_KEYS if not _present(config, key)]
 
 
-def required_keys_error(config, missing: list[str]) -> pytest.UsageError:
-    """Build the precise configure-time abort for missing safety keys."""
-    inifile = getattr(config, "inipath", None) or "your pytest ini file"
-    template = "\n".join(
+# Ini-file section headers, by the file pytest resolved the settings from.
+# ``pytest.ini`` and ``tox.ini`` share ``[pytest]``; ``setup.cfg`` needs the
+# namespaced form because the file is not pytest's alone.
+_INI_SECTION_BY_SUFFIX = {".ini": "[pytest]", ".cfg": "[tool:pytest]"}
+
+
+def remediation_block(inipath) -> str:
+    """The most-restrictive starting stance, in ``inipath``'s own syntax.
+
+    A configuration snippet a project cannot paste is not remediation. TOML
+    quotes values and writes lists in brackets; classic ini files take literal
+    unquoted text and one list entry per indented line, so a TOML block pasted
+    into ``pytest.ini`` produces a second error instead of a fix.
+
+    ``None`` (no ini file at all yet) renders TOML, because the file such a
+    project should create is ``pyproject.toml``.
+    """
+    suffix = Path(str(inipath)).suffix.lower() if inipath else ""
+    section = _INI_SECTION_BY_SUFFIX.get(suffix)
+    if section is not None:
+        return "\n".join(
+            [
+                section,
+                f"{KEY_SOCKETS} = deny",
+                f"{KEY_SOCKET_ALLOWLIST} =",
+                f"{KEY_UNIX_SOCKET_ALLOWLIST} =",
+                f"{KEY_LOOPBACK} = deny",
+                f"{KEY_SANDBOX_REQUIRED} = false",
+            ]
+        )
+    return "\n".join(
         [
             "[tool.pytest.ini_options]",
             f'{KEY_SOCKETS} = "deny"',
@@ -255,6 +283,13 @@ def required_keys_error(config, missing: list[str]) -> pytest.UsageError:
             f'{KEY_SANDBOX_REQUIRED} = "false"',
         ]
     )
+
+
+def required_keys_error(config, missing: list[str]) -> pytest.UsageError:
+    """Build the precise configure-time abort for missing safety keys."""
+    inipath = getattr(config, "inipath", None)
+    inifile = inipath or "your pytest ini file"
+    template = remediation_block(inipath)
     return pytest.UsageError(
         "stricttest is installed, and installing it IS adoption -- but this "
         "project has not declared its safety stance. Missing required ini "
