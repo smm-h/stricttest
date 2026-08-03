@@ -52,26 +52,31 @@
   "en/typescript-src-env.md": {
     "content": "83dd97bbffef8158329e1522f094497f2f360d1819a3f308710cd6860bbbf067",
     "description": "feecd5ec4ae6e15b312e99a69fcb80d24e6eac73b777e5e5d70cbd0b64f248d3",
-    "seed_hash": "feecd5ec4ae6e15b312e99a69fcb80d24e6eac73b777e5e5d70cbd0b64f248d3"
+    "seed_hash": "feecd5ec4ae6e15b312e99a69fcb80d24e6eac73b777e5e5d70cbd0b64f248d3",
+    "source_docstring": "9ea36c26c1242a24b85d95e5b598f64c18f74bf6b391825c36b68e837131157d"
   },
   "en/typescript-src-hygiene.md": {
     "content": "2a820ba5b8a4dfe41a46999a6cb0db212236670e5f489332d67c2386e105254e",
     "description": "4ab3ac451910ee6daf09c5a615091d89c5f664417d76f84516b8f2710fb97df3",
-    "seed_hash": "4ab3ac451910ee6daf09c5a615091d89c5f664417d76f84516b8f2710fb97df3"
+    "seed_hash": "4ab3ac451910ee6daf09c5a615091d89c5f664417d76f84516b8f2710fb97df3",
+    "source_docstring": "c58f8f0a6d34bb0126b2e268dde2584aaf0dcda9940ab632cedf74d4f6a78212"
   },
   "en/typescript-src-index.md": {
     "content": "4354af8de8f0ca341a89d2197f52534f7d1a5f1dfe0080a63b769cbc55409849",
     "description": "a1ba7ef9bd70007563f05ab46fbdad8cfbd534b4ff0a844cd04fa62249ec8156",
-    "seed_hash": "a1ba7ef9bd70007563f05ab46fbdad8cfbd534b4ff0a844cd04fa62249ec8156"
+    "seed_hash": "a1ba7ef9bd70007563f05ab46fbdad8cfbd534b4ff0a844cd04fa62249ec8156",
+    "source_docstring": "ed70a2faf1d34b1d7f14067de4ffe26f7e154cf78b28475e6a3b16bfc4143ecc"
   },
   "en/typescript-src-sandbox.md": {
     "content": "a56539002526294e7cdefce26fdcd09cd0c587a165475108f6940c6fddca1568",
     "description": "22b9aeaf77ba803e8db07802c6f12180c9d6fab8684f15e4a3a97743f90afb2a",
-    "seed_hash": "22b9aeaf77ba803e8db07802c6f12180c9d6fab8684f15e4a3a97743f90afb2a"
+    "seed_hash": "22b9aeaf77ba803e8db07802c6f12180c9d6fab8684f15e4a3a97743f90afb2a",
+    "source_docstring": "541b37f51cc1296f230eeb50076caef26dd48f5884bdc4beaadd493fe048aa2e"
   },
   "en/typescript-src-scope.md": {
     "content": "39e7436fb979e6be3e4280ef3c08924cce45e64e509c6959d0f7461bc9079ac5",
     "description": "8f5d528dd68edb84032cda7e07462a923cce7d0ac357f9793a047ca6a81763dd",
-    "seed_hash": "8f5d528dd68edb84032cda7e07462a923cce7d0ac357f9793a047ca6a81763dd"
+    "seed_hash": "8f5d528dd68edb84032cda7e07462a923cce7d0ac357f9793a047ca6a81763dd",
+    "source_docstring": "11365a31cfce9ff7244a309ac910e021f4109096d2db873f9fdd7b44dda979b4"
   }
 }
