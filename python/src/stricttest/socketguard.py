@@ -11,10 +11,13 @@ Granularity is host:port and unix-socket path -- pytest-socket only offers
 host-level blocking, which is unusable for database tests that need exactly one
 port or exactly one unix socket.
 
-Scope, stated plainly: this guard sees connects made through Python's ``socket``
-module. Network performed by a spawned subprocess (git, gh, psql) is invisible
-to it. Whole-process network isolation is the sandbox runner's job
-(``--unshare-net``); this guard is the in-process floor beneath it.
+Scope, stated plainly: this guard sees the connects, datagram sends and name
+resolutions made through Python's ``socket`` module -- resolution included,
+because a DNS query for a forbidden host has already left the machine by the
+time a connect could be refused. Network performed by a spawned subprocess
+(git, gh, psql) is invisible to it. Whole-process network isolation is the
+sandbox runner's job (``--unshare-net``); this guard is the in-process floor
+beneath it.
 """
 
 from __future__ import annotations
@@ -131,6 +134,11 @@ def _check_inet(policy: Policy, address) -> None:
 
 
 def _check_address(policy: Policy, sock, address) -> None:
+    if address is None:
+        # ``socket.sendmsg`` on a CONNECTED socket audits a None address. The
+        # destination was already checked at connect time, so there is nothing
+        # left to decide -- and refusing here would block an authorized peer.
+        return
     family = getattr(sock, "family", None)
     if family == getattr(socket, "AF_UNIX", None):
         _check_unix(policy, address)
@@ -143,11 +151,16 @@ def _check_address(policy: Policy, sock, address) -> None:
     # blocking them would break unrelated OS plumbing without buying safety.
 
 
-def _check_getaddrinfo(policy: Policy, host, port) -> None:
+def _check_resolution(policy: Policy, host, port=None) -> None:
     """Refuse name resolution that could only serve a forbidden connect.
 
     Resolution is blocked before the connect so the failure names the host
-    instead of surfacing later as an opaque timeout.
+    instead of surfacing later as an opaque timeout -- and, more importantly,
+    because a resolution IS egress: a DNS query for a forbidden host has
+    already left the machine by the time the connect would be refused.
+
+    ``port`` is present for ``getaddrinfo`` and absent for the
+    ``gethostbyname`` / ``gethostbyaddr`` family, which resolve a bare name.
     """
     if host in (None, "", b""):
         return
@@ -160,7 +173,8 @@ def _check_getaddrinfo(policy: Policy, host, port) -> None:
         raise _blocked(policy, "loopback name resolution of", repr(text))
     if text in policy.allowlist_hosts():
         return
-    raise _blocked(policy, "name resolution of", f"{text!r} (port {port!r})")
+    where = f"{text!r}" if port is None else f"{text!r} (port {port!r})"
+    raise _blocked(policy, "name resolution of", where)
 
 
 def _hook(event: str, args) -> None:
@@ -171,8 +185,19 @@ def _hook(event: str, args) -> None:
         _check_address(policy, args[0], args[1])
     elif event == "socket.sendto":
         _check_address(policy, args[0], args[1])
+    elif event == "socket.sendmsg":
+        # Same ``(sock, address)`` payload as sendto: a datagram that never
+        # calls connect. Without this, UDP egress bypasses the guard entirely.
+        _check_address(policy, args[0], args[1])
     elif event == "socket.getaddrinfo":
-        _check_getaddrinfo(policy, args[0], args[1])
+        _check_resolution(policy, args[0], args[1])
+    elif event == "socket.gethostbyname":
+        # ``gethostbyname`` / ``gethostbyname_ex`` do NOT route through
+        # getaddrinfo; they raise this event and then query the resolver.
+        _check_resolution(policy, args[0])
+    elif event == "socket.gethostbyaddr":
+        # Reverse resolution -- also raised by ``socket.getfqdn``.
+        _check_resolution(policy, args[0])
 
 
 def install(settings: Settings) -> None:

@@ -85,6 +85,80 @@ def test_public_name_resolution_is_denied_by_default(inner):
     inner.run("-q").assert_outcomes(passed=1)
 
 
+def test_gethostbyname_is_denied_by_default(inner):
+    """``gethostbyname`` is a real DNS query on its own audit event.
+
+    It does NOT go through ``getaddrinfo``, so a guard that only watches
+    ``socket.getaddrinfo`` lets a resolver packet leave the machine.
+    """
+    inner.write(
+        {
+            "test_dns.py": (
+                "import socket\n"
+                "import pytest\n"
+                "from stricttest import NetworkBlocked\n"
+                "\n"
+                "def test_gethostbyname_denied():\n"
+                "    with pytest.raises(NetworkBlocked) as exc:\n"
+                "        socket.gethostbyname('example.com')\n"
+                "    assert 'name resolution' in str(exc.value)\n"
+                "\n"
+                "def test_gethostbyname_ex_denied():\n"
+                "    with pytest.raises(NetworkBlocked):\n"
+                "        socket.gethostbyname_ex('example.com')\n"
+            )
+        }
+    )
+    inner.run("-q").assert_outcomes(passed=2)
+
+
+def test_gethostbyaddr_is_denied_by_default(inner):
+    """Reverse resolution is a DNS query too, on its own audit event."""
+    inner.write(
+        {
+            "test_dns.py": (
+                "import socket\n"
+                "import pytest\n"
+                "from stricttest import NetworkBlocked\n"
+                "\n"
+                "def test_gethostbyaddr_denied():\n"
+                "    with pytest.raises(NetworkBlocked) as exc:\n"
+                "        socket.gethostbyaddr('93.184.216.34')\n"
+                "    assert 'name resolution' in str(exc.value)\n"
+            )
+        }
+    )
+    inner.run("-q").assert_outcomes(passed=1)
+
+
+def test_udp_sendmsg_is_denied_by_default(inner):
+    """``sendmsg`` sends a datagram without ever calling ``connect``.
+
+    ``sendto`` was guarded from the start; ``sendmsg`` is its sibling with the
+    same ``(sock, address)`` audit payload, and an unguarded one is a UDP
+    packet leaving the machine.
+    """
+    inner.write(
+        {
+            "test_udp.py": (
+                "import socket\n"
+                "import pytest\n"
+                "from stricttest import NetworkBlocked\n"
+                "\n"
+                "def test_sendmsg_denied():\n"
+                "    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n"
+                "    try:\n"
+                "        with pytest.raises(NetworkBlocked) as exc:\n"
+                "            sock.sendmsg([b'stricttest'], [], 0, ('8.8.8.8', 53))\n"
+                "    finally:\n"
+                "        sock.close()\n"
+                "    assert '8.8.8.8:53' in str(exc.value)\n"
+            )
+        }
+    )
+    inner.run("-q").assert_outcomes(passed=1)
+
+
 def test_refusal_is_not_swallowed_by_a_broad_except(inner):
     """``NetworkBlocked`` is a ``BaseException`` so sloppy code cannot hide it."""
     inner.write(
@@ -137,6 +211,98 @@ def test_loopback_allow_permits_local_connects(inner):
         ini={"stricttest_loopback": "allow"},
     )
     inner.run("-q").assert_outcomes(passed=2)
+
+
+def test_loopback_allow_permits_every_guarded_event(inner):
+    """Every event the guard watches honors the loopback carve-out.
+
+    Resolution may still fail on an offline machine, so the assertion is
+    "not refused by the guard", never "resolution succeeded".
+    """
+    port = _free_port()
+    inner.write(
+        {
+            "test_loopback_events.py": (
+                "import socket\n"
+                "from stricttest import NetworkBlocked\n"
+                "\n"
+                f"PORT = {port}\n"
+                "\n"
+                "def not_blocked(fn, *args):\n"
+                "    try:\n"
+                "        fn(*args)\n"
+                "    except NetworkBlocked as exc:\n"
+                "        raise AssertionError(f'the guard refused loopback: {exc}')\n"
+                "    except OSError:\n"
+                "        pass  # resolution/delivery may fail offline; the guard let it through\n"
+                "\n"
+                "def test_gethostbyname_localhost():\n"
+                "    not_blocked(socket.gethostbyname, 'localhost')\n"
+                "\n"
+                "def test_gethostbyaddr_loopback():\n"
+                "    not_blocked(socket.gethostbyaddr, '127.0.0.1')\n"
+                "\n"
+                "def test_getaddrinfo_localhost():\n"
+                "    not_blocked(socket.getaddrinfo, 'localhost', PORT)\n"
+                "\n"
+                "def test_sendto_loopback():\n"
+                "    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n"
+                "    try:\n"
+                "        not_blocked(sock.sendto, b'x', ('127.0.0.1', PORT))\n"
+                "    finally:\n"
+                "        sock.close()\n"
+                "\n"
+                "def test_sendmsg_loopback():\n"
+                "    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n"
+                "    try:\n"
+                "        not_blocked(sock.sendmsg, [b'x'], [], 0, ('127.0.0.1', PORT))\n"
+                "    finally:\n"
+                "        sock.close()\n"
+                "\n"
+                "def test_sendmsg_on_a_connected_socket_carries_no_address():\n"
+                "    # The audit payload's address is None here; the destination was\n"
+                "    # already authorized at connect time, so this must not be refused.\n"
+                "    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n"
+                "    try:\n"
+                "        not_blocked(sock.connect, ('127.0.0.1', PORT))\n"
+                "        not_blocked(sock.sendmsg, [b'x'])\n"
+                "    finally:\n"
+                "        sock.close()\n"
+            ),
+        },
+        ini={"stricttest_loopback": "allow"},
+    )
+    inner.run("-q").assert_outcomes(passed=6)
+
+
+def test_allowlisted_host_permits_its_name_resolution(inner):
+    """An allowlisted host resolves through every resolution event."""
+    port = _free_port()
+    inner.write(
+        {
+            "test_allowlisted_dns.py": (
+                "import socket\n"
+                "from stricttest import NetworkBlocked\n"
+                "\n"
+                "def not_blocked(fn, *args):\n"
+                "    try:\n"
+                "        fn(*args)\n"
+                "    except NetworkBlocked as exc:\n"
+                "        raise AssertionError(f'the guard refused an allowlisted host: {exc}')\n"
+                "    except OSError:\n"
+                "        pass\n"
+                "\n"
+                "def test_gethostbyname_allowlisted():\n"
+                "    not_blocked(socket.gethostbyname, 'localhost')\n"
+            ),
+        },
+        ini={
+            "stricttest_sockets": "allowlist",
+            "stricttest_loopback": "deny",
+            "stricttest_socket_allowlist": [f"localhost:{port}"],
+        },
+    )
+    inner.run("-q").assert_outcomes(passed=1)
 
 
 # ---------------------------------------------------------------------------
