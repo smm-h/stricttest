@@ -1,9 +1,9 @@
 {
   "version": 1,
   "files": {
-    "VERSION": "e9dd8507f4bf0c6f42458e41aea833ad0bd3f6127272335eee9bf4d58541ed67",
+    "VERSION": "80447316529fc62014fbaa047fb67c51ac30e32830cda370405349d8d66d196c",
     ".github/workflows/ci.yml": "84f83ef1da232c30873f64fa442ba8ddc2cfb2d2581e8072a125e54dc066fadc",
-    ".github/workflows/publish.yml": "360f3200bb204406b62c4acde9ea0fe0c4375783fba4b572964fd0e2e4d4bfcf",
+    ".github/workflows/publish.yml": "f060ed1f22f46febc7c145a7341a1d7c9a0d431977571ef02ea2a3fb2b1968b0",
     ".gitignore": "c32366f560dbf628eb04a94d25e8d8acf719605b2ea27d31047df16e13580c04",
     ".rlsbl/lint/go.toml": "807d5cf760baad6d571a5bfd43cb163efe356f7462ba9f1918d72de45f62339f"
   }
