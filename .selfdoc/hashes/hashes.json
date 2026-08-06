@@ -12,7 +12,8 @@
   "en/go-pgcluster.md": {
     "content": "e652cbf9034d784ec97abce68d143a6231824ff8125face7f20c17f1bc2a969a",
     "description": "218eea0226f099b78683df4c7b3845d796a8ad3694568d91ec8b6399338271a8",
-    "seed_hash": "218eea0226f099b78683df4c7b3845d796a8ad3694568d91ec8b6399338271a8"
+    "seed_hash": "218eea0226f099b78683df4c7b3845d796a8ad3694568d91ec8b6399338271a8",
+    "source_docstring": "3d764ab6cf7e9cf68765a178809df07ea63377ade94ecece2553839352b1de2a"
   },
   "en/python-src-stricttest-config.md": {
     "content": "8ad381440557c1921683d7d0b53716b23839413525be720e5006ed79cdb1ae55",
