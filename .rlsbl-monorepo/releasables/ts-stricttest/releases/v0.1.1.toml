@@ -1,0 +1,16 @@
+bump = "infra"
+description = "Fix the CI router paths filter so a batch release's tagged commit runs every project's test suite"
+context = """The 0.1.0 batch release landed every releasable's tag on the final "snapshot"
+commit, which touches only .rlsbl-monorepo/snapshot.json. ts-stricttest's gate
+passed only by luck -- its own release commit rode in the same push window, so
+its suite had run on that commit; the Python and Go gates saw a skipped check
+and hard-failed, leaving PyPI unpublished.
+
+The fix adds .rlsbl-monorepo/snapshot.json and
+.rlsbl-monorepo/releasables/<name>/** to every project's watch patterns, so the
+commit a batch release actually tags now triggers all three suites. This release
+runs the corrected pipeline end to end and resyncs all three releasables to
+0.1.1, superseding the burned npm 0.1.0.
+"""
+include = ["npm"]
+exclude = []

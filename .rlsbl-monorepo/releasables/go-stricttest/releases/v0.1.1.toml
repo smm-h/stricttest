@@ -1,0 +1,16 @@
+bump = "infra"
+description = "Fix the CI router paths filter so a batch release's tagged commit runs every project's test suite"
+context = """The 0.1.0 batch release landed every releasable's tag on the final "snapshot"
+commit, which touches only .rlsbl-monorepo/snapshot.json. No project's paths
+filter matched that file, so the CI router reported
+"go-stricttest-ci / test: skipped" on the tagged commit and the publish gate
+refused to treat a skipped check as passing.
+
+The fix adds .rlsbl-monorepo/snapshot.json and
+.rlsbl-monorepo/releasables/<name>/** to every project's watch patterns, so the
+commit a batch release actually tags now triggers all three suites. This release
+runs the corrected pipeline end to end and resyncs all three releasables to
+0.1.1.
+"""
+include = ["go"]
+exclude = []
