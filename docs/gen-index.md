@@ -1,6 +1,6 @@
 ---
 title: API Reference
-description: "API reference index for stricttest: the pytest plugin's config, env floor, guards and Postgres cluster, plus the Go hygiene package and the npm floor."
+description: "API reference for stricttest: the pytest plugin's config, env floor, guards and Postgres cluster, the Go hygiene and pgcluster packages, and the npm floor."
 generated: true
 nav_group: "API Reference"
 nav_order: 0

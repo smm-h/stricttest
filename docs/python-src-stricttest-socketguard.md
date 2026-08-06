@@ -1,6 +1,6 @@
 ---
 title: python.src.stricttest.socketguard
-description: "The audit-hook network guard: it refuses connects, datagram sends and name resolution, with host:port and unix-path allowlists and a loopback stance."
+description: "The audit-hook network guard: it refuses connects, datagram sends and name resolution made through Python's socket module -- a C driver is invisible to it."
 generated: true
 nav_group: "API Reference"
 nav_order: 8

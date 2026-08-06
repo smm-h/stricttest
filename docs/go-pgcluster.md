@@ -1,8 +1,7 @@
 ---
 title: go/pgcluster
-description: "Package pgcluster boots an ephemeral PostgreSQL cluster for a test binary."
+description: "The Go ephemeral PostgreSQL launcher: initdb onto tmpfs, a postmaster on a private unix socket, a throwaway database per test, and no linked driver."
 generated: true
-seeded: true
 nav_group: "API Reference"
 nav_order: 2
 ---
