@@ -9,6 +9,11 @@
     "description": "ffbff62d7339208e338480534d35346f4fbe7dfea9b3e7ca2e33f5dd465f7445",
     "source_docstring": "6e1817e4bd5b7a180f34824144449b27b06168cea3478b1c2c7be667aa5bd876"
   },
+  "en/go-pgcluster.md": {
+    "content": "e652cbf9034d784ec97abce68d143a6231824ff8125face7f20c17f1bc2a969a",
+    "description": "218eea0226f099b78683df4c7b3845d796a8ad3694568d91ec8b6399338271a8",
+    "seed_hash": "218eea0226f099b78683df4c7b3845d796a8ad3694568d91ec8b6399338271a8"
+  },
   "en/python-src-stricttest-config.md": {
     "content": "8ad381440557c1921683d7d0b53716b23839413525be720e5006ed79cdb1ae55",
     "description": "2cc55022b3db1f24e7dff5d5e467cc0749e073c350c0a6c053f6786f624c2137",

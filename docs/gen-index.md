@@ -11,6 +11,7 @@ order: 90
 # API Reference
 
 - [go/hygiene](go-hygiene.html)
+- [go/pgcluster](go-pgcluster.html)
 - [python.src.stricttest](python-src-stricttest.html)
 - [python.src.stricttest.config](python-src-stricttest-config.html)
 - [python.src.stricttest.envfloor](python-src-stricttest-envfloor.html)

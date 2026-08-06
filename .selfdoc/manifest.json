@@ -18,6 +18,11 @@
       "type": "doc"
     },
     {
+      "path": "go-pgcluster.md",
+      "title": "go/pgcluster",
+      "type": "doc"
+    },
+    {
       "path": "python-src-stricttest-config.md",
       "title": "python.src.stricttest.config",
       "type": "doc"
@@ -84,5 +89,5 @@
     }
   ],
   "posts": [],
-  "last_gen": "2026-08-03T12:21:21.278104+00:00"
+  "last_gen": "2026-08-06T11:37:51.532990+00:00"
 }
