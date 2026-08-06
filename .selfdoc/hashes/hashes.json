@@ -1,8 +1,8 @@
 {
   "_hash_version": 3,
   "en/gen-index.md": {
-    "content": "4a0a20e5869ade5379d15fb3ed6775919a300de522f978ad0605d95c79858f25",
-    "description": "0ec24dd2384bf1ae74f3efe099e97da14aba030562f94963c988d985827b5a68"
+    "content": "52fd666afb28eed0f8da8f50796089bd0195fb81e45377005bae5bcdb687941e",
+    "description": "14d615576d8ab7448f346230de328cb902926b693e3ab925bf036b7bace02d54"
   },
   "en/go-hygiene.md": {
     "content": "5e3803e518940cecd8071876a257787abf940d242708341961142d830cad48e8",
@@ -47,8 +47,8 @@
   },
   "en/python-src-stricttest-socketguard.md": {
     "content": "0bcfeb40b65d5b26e468c65baf8e252a588f53b330ab329af26239a77983b38a",
-    "description": "5c555cbbbefa8745a9d0bd1b20958ef73cb31cda441af1bf4aa0219550c4cd70",
-    "source_docstring": "5c4d8ec0f426719a958e68a1a590b9edfd45f491eb92a5d625eed3a9e111e2d1"
+    "description": "6a3f43ae545dcee8fb86dca4f13770bbda09f0c2a152e68ddb5373982c1dc281",
+    "source_docstring": "fc9330cfdc58fd6ec1e76a32c8239272481f65403d2a6bc93132d41f5c60f464"
   },
   "en/python-src-stricttest.md": {
     "content": "d4061e4595e3e183cd916511bbb06f149302ece1701f34156cbc57de377b705f",
