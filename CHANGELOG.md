@@ -2,6 +2,47 @@
 
 # py-stricttest
 
+## Unreleased
+
+### Fixes
+
+- [stricttest] **Corrected the socket guard's documented coverage.** The docs told a suite using `psycopg` to allowlist the ephemeral cluster's socket directory. That never did anything: `psycopg` connects inside libpq, a C extension, where the audit hook is never called, so there is no event to allow or refuse and no stance protects such a consumer. The allowlist covers `asyncpg` and other clients written in Python; for a libpq driver the protection is pointing the DSN at an ephemeral cluster.
+
+## 0.1.1
+
+Fix the CI router paths filter so a batch release's tagged commit runs every project's test suite
+
+<details>
+<summary>Context</summary>
+
+The 0.1.0 batch release published only npm and the Go module proxy. PyPI never
+got a build at all, because the publish gate hard-failed for py-stricttest and
+go-stricttest.
+
+Cause: a batch release pushes each releasable's candidate in a separate push and
+lands every tag on the final "snapshot" commit. That commit (dd7e3a9) touches
+only .rlsbl-monorepo/snapshot.json, which no project's paths filter matched, so
+the CI router ran only ts-stricttest's suite on it and reported
+"stricttest-ci / test: skipped" and "go-stricttest-ci / test: skipped". The
+publish gate refuses to treat a skipped check as passing -- correctly -- so the
+Python and Go publish jobs failed while the TypeScript one succeeded, purely
+because ts-stricttest's own release commit happened to ride in the same push
+window.
+
+The fix adds .rlsbl-monorepo/snapshot.json and
+.rlsbl-monorepo/releasables/<name>/** to every project's watch patterns, so the
+commit a batch release actually tags now triggers all three suites.
+
+This release is the proof: it runs the whole pipeline end to end and resyncs all
+three releasables to 0.1.1. npm 0.1.0 is burned and superseded; PyPI gets its
+first publish here.
+
+</details>
+
+### Infrastructure
+
+- Fix the CI router paths filter so a batch release's tagged commit runs every project's test suite
+
 ## 0.1.0
 
 ### Features
