@@ -105,10 +105,28 @@ def db_url(pg):
 There is no default for `dsn_env`: the variable an application reads its
 connection string from is the application's decision. The kernel's 107-byte
 `sun_path` limit is checked before anything is executed, so a long temp path
-fails with a precise message instead of an unexplained `bind()` error. The
-cluster listens on a unix socket only -- an in-process driver therefore needs
-the socket directory's parent in `stricttest_unix_socket_allowlist` (e.g.
-`/dev/shm/`); `psql` subprocesses need nothing.
+fails with a precise message instead of an unexplained `bind()` error.
+
+The cluster listens on a unix socket only, and what the socket guard makes of
+that depends on the driver. `asyncpg` connects through Python's `socket`
+module, so the guard sees it and the socket directory's parent has to be in
+`stricttest_unix_socket_allowlist` (e.g. `/dev/shm/`). `psycopg` and everything
+else built on libpq connect inside a C extension, where no audit event is ever
+raised -- the guard cannot see those connections, cannot refuse them, and
+cannot be made to allow them, so an allowlist entry changes nothing for them in
+either direction. Pointing the application's DSN at this cluster is what
+protects a libpq consumer, and it is structural rather than a stance: a
+connection the guard never saw still lands in a throwaway database on a private
+socket. `psql` subprocesses are outside the guard for the same reason and need
+nothing.
+
+Go suites get the same launcher as [`go/pgcluster`](go/pgcluster/): `Start` and
+`Stop` for `TestMain`, `Ephemeral` and `Database(t)` for a test, sentinel
+errors so a machine without PostgreSQL skips instead of failing, and the same
+zero-dependency rule -- `initdb`, `pg_ctl` and `psql` are subprocesses, never a
+linked driver. One difference is documented rather than solved: Go has no
+`atexit`, so a test binary killed outright (SIGKILL, a cancelled CI job) leaves
+its postmaster running where the Python launcher would have reaped it.
 
 ## The Go module
 
@@ -172,6 +190,15 @@ refused. Network performed by a spawned subprocess (git, gh, psql) is invisible
 to it;
 whole-process network isolation is the sandbox runner's job. The guard is the
 in-process floor beneath it, not a replacement for it.
+
+A C extension that calls `connect()` itself is invisible to the guard too. The
+audit events are raised by Python's `socket` module, so a libpq-backed driver
+(`psycopg`) or any other native client connects at a level the hook never runs
+at. No allowlist entry helps -- there is no event to allow or deny -- and no
+stance offered here protects such a consumer. Clients written in Python
+(`asyncpg`, `httpx`, `requests`, `urllib`) go through `socket` and are covered.
+For the rest the protection has to be structural: an ephemeral database at the
+end of the socket, or the sandbox runner's network namespace.
 
 There is no socket guard in the Go module or the npm package at all. Neither
 language has a `sys.addaudithook` equivalent -- an interception point the

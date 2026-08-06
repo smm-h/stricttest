@@ -10,6 +10,10 @@
       "language": "go"
     },
     {
+      "path": "go/pgcluster",
+      "language": "go"
+    },
+    {
       "path": "typescript/src",
       "language": "typescript"
     }

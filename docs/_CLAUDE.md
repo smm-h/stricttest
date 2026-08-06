@@ -3,8 +3,9 @@ title: CLAUDE.md
 ---
 # stricttest
 
-An always-on test-isolation floor: a pytest plugin (`python/`), a Go
-env-hygiene module (`go/`), and a Node env-hygiene package (`typescript/`).
+An always-on test-isolation floor: a pytest plugin (`python/`), a Go module
+carrying the same env floor plus an ephemeral PostgreSQL launcher (`go/`), and
+a Node env-hygiene package (`typescript/`).
 
 ## Layout
 
@@ -36,6 +37,20 @@ env-hygiene module (`go/`), and a Node env-hygiene package (`typescript/`).
   Python has `sys.addaudithook`. Never add a `net.Dial` or
   `net.Socket.prototype.connect` patch to the Go module or the npm package: a
   partial guard reads as a guarantee and is worse than none.
+- **Never write that the socket guard covers a libpq driver.** The audit events
+  are raised by Python's `socket` module, so `psycopg` -- a C extension --
+  connects where the hook never runs. There is no event to allow, so
+  `stricttest_unix_socket_allowlist` changes nothing for it in either
+  direction. `asyncpg` is pure Python, is seen, and does need the allowlist
+  entry. Any doc that mentions the guard and a database driver in the same
+  breath has to make that distinction.
+- **The two cluster launchers stay in lockstep.** `python/src/stricttest/pgcluster.py`
+  and `go/pgcluster/` boot the same cluster: the same `initdb` and `pg_ctl`
+  flags, the same 107-byte `sun_path` refusal, the same parent-candidate order,
+  the same closed database-name character set, the same `PG*` environment
+  scrub. Changing one means changing the other in the same commit. The one
+  documented divergence is the killed-binary postmaster leak: Python reaps
+  through `atexit`, Go has no equivalent and says so in its package doc.
 - **Guards raise `BaseException` subclasses on purpose.** `NetworkBlocked` and
   `pytest.fail`'s `Failed` slip past production `except Exception` handlers so a
   swallowed refusal cannot become a silent pass. Do not "fix" this.

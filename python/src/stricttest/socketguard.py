@@ -18,6 +18,18 @@ time a connect could be refused. Network performed by a spawned subprocess
 (git, gh, psql) is invisible to it. Whole-process network isolation is the
 sandbox runner's job (``--unshare-net``); this guard is the in-process floor
 beneath it.
+
+A C extension that calls ``connect()`` itself is equally invisible, and this is
+worth being blunt about because it is easy to assume otherwise. The audit
+events this guard listens for are raised by Python's ``socket`` module, so a
+libpq-backed driver (``psycopg``) or any other native client opens its
+connection at a level the hook never runs at. That is not a gap an allowlist
+can close: there is no event to allow, so allowlisting changes nothing in
+either direction, and no stance offered here protects such a consumer. Clients
+implemented in Python (``asyncpg``, ``httpx``, ``requests``, ``urllib``) go
+through ``socket`` and are covered. For the ones that are not, the protection
+has to be structural -- an ephemeral database at the end of the socket
+(:mod:`stricttest.pgcluster`), or the sandbox runner's network namespace.
 """
 
 from __future__ import annotations

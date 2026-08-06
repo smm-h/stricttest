@@ -36,15 +36,29 @@ standard library and the PostgreSQL binaries it launches -- ``initdb``,
 library, nothing else" rule.
 
 **Interaction with the socket guard.** The cluster listens on a unix socket
-only, and in-process drivers (psycopg, asyncpg) connect through it. The socket
-guard refuses unix connects that are not allowlisted, so a suite that talks to
-the cluster from Python must allowlist the socket directory's parent as a
-prefix, e.g.::
+only. What that means for the socket guard depends entirely on how the driver
+is implemented, and the answer is not the one an allowlist key suggests.
+
+``asyncpg`` speaks the wire protocol from Python and opens its connection
+through ``socket``, so the audit hook fires and the guard refuses the connect
+unless it is allowlisted. A suite that reaches the cluster through asyncpg must
+allowlist the socket directory's parent as a prefix::
 
     stricttest_unix_socket_allowlist = ["/dev/shm/"]
 
-Talking to the cluster through ``psql`` (a subprocess) needs no allowlist entry:
-the guard is in-process.
+``psycopg`` -- and anything else built on libpq -- is a C extension. The
+connect happens inside libpq, never through Python's ``socket`` module, so no
+audit event is ever raised. The guard does not see the connection, cannot
+refuse it, and cannot be made to allow it: there is no event to allow. Adding
+the socket directory to ``stricttest_unix_socket_allowlist`` changes nothing
+for a libpq consumer, in either direction, and no stance this plugin offers
+protects one. The same is true of ``psql``, which is a subprocess.
+
+The protection that does work for every driver is this module. Point the
+application's DSN at the ephemeral cluster and a connection the guard never
+saw still lands in a throwaway database on a private socket rather than on a
+real server. That is structural rather than a policy, which is why it holds for
+the drivers the guard is blind to.
 """
 
 from __future__ import annotations
