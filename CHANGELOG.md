@@ -2,7 +2,29 @@
 
 # py-stricttest
 
-## Unreleased
+## 0.2.0
+
+Correct the socket guard's documented coverage: a libpq driver is invisible to it
+
+<details>
+<summary>Context</summary>
+
+The docs told a suite using psycopg to allowlist the ephemeral cluster's socket
+directory. That instruction never did anything. psycopg connects inside libpq, a
+C extension, so Python's socket module never raises an audit event and the guard
+never sees the connection -- there is nothing to allow and nothing to refuse. A
+consumer who followed the old text believed a stance was protecting it when no
+stance could.
+
+The corrected text draws the line explicitly: the allowlist covers asyncpg and
+other clients written in Python, which the guard does see and which do need the
+entry; for a libpq driver the only real protection is pointing the DSN at an
+ephemeral cluster. The same caveat now appears in the pgcluster module docstring,
+the socket guard's scope paragraph, and the README, none of which stated it
+before. A repo rule was added so no future doc can mention the guard and a
+database driver without making the distinction.
+
+</details>
 
 ### Fixes
 
