@@ -1,10 +1,25 @@
 [releasables.py-stricttest]
 # Version bump type: patch, minor, major, infra, or prerelease
-bump = ""
+bump = "minor"
 # Short description of this release (required)
-description = ""
+description = "Correct the socket guard's documented coverage: a libpq driver is invisible to it"
 # Optional context explaining why these changes were made
-context = ""
+context = """
+The docs told a suite using psycopg to allowlist the ephemeral cluster's socket
+directory. That instruction never did anything. psycopg connects inside libpq, a
+C extension, so Python's socket module never raises an audit event and the guard
+never sees the connection -- there is nothing to allow and nothing to refuse. A
+consumer who followed the old text believed a stance was protecting it when no
+stance could.
+
+The corrected text draws the line explicitly: the allowlist covers asyncpg and
+other clients written in Python, which the guard does see and which do need the
+entry; for a libpq driver the only real protection is pointing the DSN at an
+ephemeral cluster. The same caveat now appears in the pgcluster module docstring,
+the socket guard's scope paragraph, and the README, none of which stated it
+before. A repo rule was added so no future doc can mention the guard and a
+database driver without making the distinction.
+"""
 # Pre-release channel: alpha, beta, rc, or stable (ordered;
 # demotion is an error). Per package, so one workspace release
 # can ship some packages stable and others as alphas. See
@@ -15,11 +30,30 @@ exclude = []
 
 [releasables.go-stricttest]
 # Version bump type: patch, minor, major, infra, or prerelease
-bump = ""
+bump = "minor"
 # Short description of this release (required)
-description = ""
+description = "An ephemeral PostgreSQL cluster launcher for Go suites"
 # Optional context explaining why these changes were made
-context = ""
+context = """
+The Python floor has carried an ephemeral-cluster launcher since 0.1.0; the Go
+floor had nothing, so a Go suite needing Postgres either dialed a shared
+developer database or ran a container. This release ports the launcher, keeping
+the two implementations in lockstep: the same initdb and pg_ctl flags, the same
+107-byte sun_path refusal, the same parent-candidate order, the same closed
+database-name character set, the same PG* environment scrub.
+
+The API splits along test lifetimes. Start and Stop are TB-free so a TestMain
+can boot one cluster for a whole package; Ephemeral(t, ...) scopes a cluster to
+a single test; Database(t) hands each test its own database. The DSN environment
+variable name is a mandatory argument -- there is no default -- so a suite can
+never inherit a connection string it did not ask for.
+
+The package takes no dependencies: initdb, pg_ctl and psql are driven as
+subprocesses, never a linked driver. Missing or unusable Postgres surfaces as
+sentinel errors (ErrPostgresUnavailable and friends) rather than a panic. One
+divergence from Python is documented rather than papered over: Go has no atexit
+equivalent, so a killed test binary can leak a postmaster.
+"""
 # Pre-release channel: alpha, beta, rc, or stable (ordered;
 # demotion is an error). Per package, so one workspace release
 # can ship some packages stable and others as alphas. See
@@ -28,10 +62,16 @@ context = ""
 include = ["go"]
 exclude = []
 
-# ts-stricttest: no unreleased commits since ts-stricttest@v0.1.1
-# [releasables.ts-stricttest]
-# bump = ""
-# description = ""
-# context = ""
-# include = ["npm"]
-# exclude = []
+[releasables.ts-stricttest]
+# Infrastructure-only: the release machinery changed, the package did not.
+bump = "infra"
+description = "Infrastructure only: refreshed release scaffolding, no package changes"
+context = """
+The only change in ts-stricttest's scope since 0.1.1 is a scaffold refresh --
+the publish workflow and the recorded scaffold bases. Nothing in the shipped
+package changed, so this release carries no user-facing entries and takes an
+infra bump. It exists to keep the three floors on a coherent release line and to
+prove the refreshed publish pipeline end to end.
+"""
+include = ["npm"]
+exclude = []
