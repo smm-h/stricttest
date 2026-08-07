@@ -145,9 +145,24 @@ runs the corrected pipeline end to end and resyncs all three releasables to
 
 # ts-stricttest
 
-## Unreleased
+## 0.1.2
 
-- No user-facing changes.
+Infrastructure only: refreshed release scaffolding, no package changes
+
+<details>
+<summary>Context</summary>
+
+The only change in ts-stricttest's scope since 0.1.1 is a scaffold refresh --
+the publish workflow and the recorded scaffold bases. Nothing in the shipped
+package changed, so this release carries no user-facing entries and takes an
+infra bump. It exists to keep the three floors on a coherent release line and to
+prove the refreshed publish pipeline end to end.
+
+</details>
+
+### Infrastructure
+
+- Infrastructure only: refreshed release scaffolding, no package changes
 
 ## 0.1.1
 
