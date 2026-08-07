@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-07T12:00:51Z",
+  "generated_at": "2026-08-07T12:00:54Z",
   "package_count": 3,
   "packages": {
     "stricttest": {
@@ -35,7 +35,7 @@
       "targets": [
         "npm"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "description": null,
       "deps": [],
       "rdeps": [],
