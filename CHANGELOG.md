@@ -57,7 +57,33 @@ first publish here.
 
 # go-stricttest
 
-## Unreleased
+## 0.2.0
+
+An ephemeral PostgreSQL cluster launcher for Go suites
+
+<details>
+<summary>Context</summary>
+
+The Python floor has carried an ephemeral-cluster launcher since 0.1.0; the Go
+floor had nothing, so a Go suite needing Postgres either dialed a shared
+developer database or ran a container. This release ports the launcher, keeping
+the two implementations in lockstep: the same initdb and pg_ctl flags, the same
+107-byte sun_path refusal, the same parent-candidate order, the same closed
+database-name character set, the same PG* environment scrub.
+
+The API splits along test lifetimes. Start and Stop are TB-free so a TestMain
+can boot one cluster for a whole package; Ephemeral(t, ...) scopes a cluster to
+a single test; Database(t) hands each test its own database. The DSN environment
+variable name is a mandatory argument -- there is no default -- so a suite can
+never inherit a connection string it did not ask for.
+
+The package takes no dependencies: initdb, pg_ctl and psql are driven as
+subprocesses, never a linked driver. Missing or unusable Postgres surfaces as
+sentinel errors (ErrPostgresUnavailable and friends) rather than a panic. One
+divergence from Python is documented rather than papered over: Go has no atexit
+equivalent, so a killed test binary can leak a postmaster.
+
+</details>
 
 ### Features
 
